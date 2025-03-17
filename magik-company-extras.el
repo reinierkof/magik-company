@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(require 'magik-cb-ac)
+(require 'magik-company-cb)
 
 (with-eval-after-load 'magik-mode
   (message "TESTING HOOK ADDED")

@@ -23,7 +23,7 @@
 ;;
 
 ;;; Code:
-(require 'magik-cb-ac)
+(require 'magik-company-cb)
 (require 'magik-company-exemplar-types)
 
 (defvar magik-company--objects-source-cache-loaded nil

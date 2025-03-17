@@ -24,7 +24,7 @@
 ;;; Code:
 
 (require 'company)
-(require 'magik-cb-ac)
+(require 'magik-company-cb)
 (require 'magik-company-annotation)
 (require 'magik-company-buffer-cache)
 (require 'magik-company-prefixes)
