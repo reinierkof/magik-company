@@ -21,6 +21,7 @@
 
 (require 'magik-cb)
 (require 'magik-session)
+(require 'magik-company-extras)
 
 (defvar magik-cb-ac--prefix nil)
 (defvar magik-cb-ac--class-method-prefix nil)

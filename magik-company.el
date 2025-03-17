@@ -45,7 +45,7 @@ COMMAND, ARG, IGNORED"
   (cl-case command
     (prefix (magik-company--prefix))
     (candidates (magik-company--candidates))
-    (annotation (magik-company--annotation arg)
+    (annotation (magik-company--annotation arg))
     (kind nil)
     (post-completion (magik-company--post-completion arg))
     )
