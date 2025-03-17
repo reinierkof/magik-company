@@ -80,8 +80,6 @@ COMMAND, ARG, IGNORED"
     ;; (setq magik-candidates (delete-dups magik-candidates))
     magik-candidates))
 
-
-
 (defun magik-company--post-completion (candidate)
   "Insert parameters in snippet for CANDIDATE."
   (if (get-text-property 0 'yasnippet candidate)

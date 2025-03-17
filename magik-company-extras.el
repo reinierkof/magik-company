@@ -34,7 +34,7 @@
 (defconst magik-session-cb-ac-buffer "*cb-company*"
   "The autocomplete class browser buffer associated with the GIS process.")
 
-(defvar magik-cb-ac-process nil
+(defvar magik-company--cb-process nil
   "Variable that references to the actual process.")
 
 (defun magik-company--kill-cb-ac-buffer ()
@@ -43,7 +43,7 @@
       (let ((magik-local-cb-ac-process (get-buffer-process (get-buffer magik-session-cb-ac-buffer))))
 	(when magik-local-cb-ac-process
           (delete-process magik-local-cb-ac-process)
-          (setq magik-cb-ac-process nil)))))
+          (setq magik-company--cb-process nil)))))
 
 (provide 'magik-company-extras)
 ;;; magik-company-extras.el ends here

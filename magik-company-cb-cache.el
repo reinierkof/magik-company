@@ -24,6 +24,7 @@
 
 ;;; Code:
 (require 'magik-cb-ac)
+(require 'magik-company-exemplar-types)
 
 (defvar magik-company--objects-source-cache-loaded nil
   "Tracks whether the object cache is loaded, for optional reset.")
@@ -58,34 +59,54 @@
     (magik-company--conditions-source-init))
   )
 
+(defun magik-company--method-candidates (prefix)
+  "List of methods on a class.
+Uses a cache variable `magik-company--class-method-source-cache'.
+All the methods beginning with the first character are returned and stored in the cache.
+Thus subsequent characters refining the match are handled by auto-complete refining
+the list of all possible matches, without recourse to the class browser.
+PREFIX ..."
+  (let ((exemplar (magik-company--exemplar-near-point))
+	(short-prefix prefix))
+    (if exemplar
+	      (progn
+          (setq short-prefix (concat exemplar "." (if (> (length short-prefix) 0) (substring short-prefix 0 1))))
+          (if (not (and magik-company--class-method-source-cache
+                        (equal (concat " " short-prefix) (car magik-company--class-method-source-cache))))
+		          (progn
+                (when (magik-company--cb-start-process)
+		             (setq magik-company--class-method-source-cache (magik-company--cb-method-candidates short-prefix))))))))
+          magik-company--class-method-source-cache
+    )
+
 (defun magik-company--objects-source-init (&optional reset)
   "Initialisation function for obtaining all Magik Objects for use in auto-complete-mode.
 If RESET is true, the cache is regenerated."
-  (when (magik-cb-ac-start-process)
+  (when (magik-company--cb-start-process)
     (when (or (not magik-company--objects-source-cache-loaded) reset)
       (let ((prefix "sw:object"))
-        (setq magik-company--objects-source-cache (magik-cb-ac-class-candidates prefix))
+        (setq magik-company--objects-source-cache (magik-company--cb-class-candidates prefix))
         (setq magik-company--objects-source-cache-loaded t)))))
 
 (defun magik-company--globals-source-init (&optional reset)
   "Initialisation function for obtaining all Magik Conditions for use in auto-complete-mode.
 If RESET is true, the cache is regenerated."
-   (when (magik-cb-ac-start-process)
+   (when (magik-company--cb-start-process)
     (when (or (not magik-company--globals-source-cache-loaded) reset)
       (let ((prefix "<global>."))
-        (setq magik-company--globals-source-cache (magik-cb-ac-method-candidates prefix))
+        (setq magik-company--globals-source-cache (magik-company--cb-method-candidates prefix))
         (setq magik-company--globals-source-cache-loaded t)))))
 
 (defun magik-company--conditions-source-init (&optional reset)
   "Initialisation function for obtaining all Magik Conditions for use in auto-complete-mode.
 If RESET is true, the cache is regenerated."
-   (when (magik-cb-ac-start-process)
+   (when (magik-company--cb-start-process)
     (when (or (not magik-company--conditions-source-cache-loaded) reset)
       (let ((prefix "<condition>."))
-        (setq magik-company--conditions-source-cache (magik-cb-ac-method-candidates prefix))
+        (setq magik-company--conditions-source-cache (magik-company--cb-method-candidates prefix))
         ;; adds an : infront so the prefix works with the results.
         (setq magik-company--conditions-source-cache
-              (mapcar (lambda (item) (concat ":" item)) (magik-cb-ac-method-candidates prefix)))
+              (mapcar (lambda (item) (concat ":" item)) (magik-company--cb-method-candidates prefix)))
         (setq magik-company--conditions-source-cache-loaded t)))))
 
 (provide 'magik-company-cb-cache)
