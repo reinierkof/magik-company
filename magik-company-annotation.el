@@ -30,35 +30,46 @@
 
 (defun magik-company--annotation (candidate)
   "Create an annotation based on parameters of CANDIDATE."
-  (when magik-company-show-params-annotation
-    (let ((args nil))
-      (setq args (nconc args (magik-company--annotation-required-params candidate)
-			(magik-company--annotation-optional-params candidate)
-			(magik-company--annotation-gather-param candidate)))
-      (when args
-	  (concat "<" (string-join args ", ") ">")))))
+(let ((a-kind (get-text-property 0 'kind candidate)))
+    (message "a-kind: %s" a-kind)  ;; Debugging
+    (if (and a-kind
+             (eq a-kind 'exemplar)) 
+        (let ((package (get-text-property 0 'package candidate)))
+          (when package
+            (prin1-to-string package)))
+      (when magik-company-show-params-annotation
+        (let ((args (delq nil (apply #'append
+                                     (list (magik-company--annotation-required-params candidate)
+                                           (magik-company--annotation-optional-params candidate)
+                                           (magik-company--annotation-gather-param candidate))))))
+          (when args
+            (concat "<" (mapconcat #'identity args ", ") ">")))))))
 
-(defun magik-company--annotation-required-params(candidate)
-  "Retrieve the arguments text property from CANDIDATE, leave space for operations."
+
+(defun magik-company--annotation-required-params (candidate)
+  "Retrieve the arguments text property from CANDIDATE, ensuring it is a list of strings."
   (let ((params (get-text-property 0 'arguments candidate)))
-      params
-      ))
+    (when (listp params)  ; Ensure it's a list
+      (mapcar #'identity params))))  ; Convert to a proper list of strings
 
-(defun magik-company--annotation-optional-params(candidate)
-  "Retrieve the optional arguments text property from CANDIDATE, make italic."
+(defun magik-company--annotation-optional-params (candidate)
+  "Retrieve the optional arguments text property from CANDIDATE, making them italic."
   (when magik-company-show-optional-params-annotation
     (let ((params (get-text-property 0 'optional candidate)))
-      (mapcar (lambda (a-param)
-		   (propertize a-param 'face '(:slant italic)))
-	      params))))
+      (when (listp params)
+        (mapcar (lambda (a-param)
+                  (propertize (format "%s" a-param) 'face '(:slant italic)))
+                params)))))
 
-(defun magik-company--annotation-gather-param(candidate)
-  "Retrieve the gather arguments text property from CANDIDATE, make italic."
+(defun magik-company--annotation-gather-param (candidate)
+  "Retrieve the gather arguments text property from CANDIDATE, making them italic."
   (when magik-company-show-gather-param-annotation
     (let ((params (get-text-property 0 'gather candidate)))
-      (mapcar (lambda (a-param)
-		   (propertize a-param 'face '(:slant italic)))
-	      params))))
+      (when (listp params)
+        (mapcar (lambda (a-param)
+                  (propertize (format "%s" a-param) 'face '(:slant italic)))
+                params)))))
+
 
 (provide 'magik-company-annotation)
 ;;; magik-company-annotation.el ends here

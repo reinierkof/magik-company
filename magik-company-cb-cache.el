@@ -24,7 +24,6 @@
 
 ;;; Code:
 (require 'magik-company-cb)
-(require 'magik-company-exemplar-types)
 
 (defvar magik-company--objects-source-cache-loaded nil
   "Tracks whether the object cache is loaded, for optional reset.")

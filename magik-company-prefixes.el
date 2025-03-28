@@ -29,6 +29,7 @@
 (defvar magik-company-prefix-at-dynamics nil)
 (defvar magik-company-prefix-at-globals nil)
 (defvar magik-company-prefix-at-objects nil)
+(defvar magik-company-prefix-at-slot nil)
 
 (defun magik-company--prefix ()
   "Prefix and what to load based on those the current point."
@@ -38,14 +39,16 @@
 	    magik-company-prefix-at-conditions nil
 	    magik-company-prefix-at-dynamics nil
 	    magik-company-prefix-at-globals nil
+	    magik-company-prefix-at-slot nil
 	    magik-company-prefix-at-objects nil)
     (progn
         (setq magik-company-prefix-at-methods (magik-company--at-method-prefix)
               magik-company-prefix-at-conditions (magik-company--at-raise-condition-prefix)
               magik-company-prefix-at-dynamics (magik-company--at-dynamic-prefix)
               magik-company-prefix-at-globals (magik-company--at-global-prefix)
-              magik-company-prefix-at-objects (magik-company--at-object-prefix))
-	(magik-company--determine-cur-prefix))))
+              magik-company-prefix-at-slot (magik-company--at-slot-prefix)
+              magik-company-prefix-at-objects (magik-company--at-object-prefix)))
+    (magik-company--determine-cur-prefix)))
 
 (defun magik-company--determine-cur-prefix()
   "The prefix from recent characters."
@@ -82,14 +85,22 @@
 (defun magik-company--at-raise-condition-prefix ()
   "Detect if the point is at condition.raise(: ."
   (save-excursion
-    (if (re-search-backward "condition\\.raise(\\s-*:\\(\\sw+\\)\\=" nil t)
+    (if (re-search-backward "condition\\.raise(\\s-*:\\(\\sw+\\)\\=" (line-beginning-position) t)
         t
       nil)))
+
+(defun magik-company--at-slot-prefix ()
+  "Detect if the point is at .vari"
+  (save-excursion
+    (if (re-search-backward "\\(?:^\\|[^[:word:].]\\)\\.\\w*\\="
+                         (line-beginning-position) t)
+       t
+     nil)))
 
 (defun magik-company--at-dynamic-prefix ()
   "Detect if the point is at a !..! dynamic prefix."
   (save-excursion
-    (if (and (re-search-backward "\\Sw\\(!\\sw*\\)\\=" nil t)
+    (if (and (re-search-backward "\\Sw\\(!\\sw*\\)\\=" (line-beginning-position) t)
              (not (eq (following-char) ?.))
              (not (equal ":" (buffer-substring-no-properties (match-beginning 1) (1+ (match-beginning 1))))))
         t

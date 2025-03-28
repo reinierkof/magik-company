@@ -23,11 +23,9 @@
 ;; 
 
 ;;; Code:
-
-(require 'magik-company-cb)
+(require 'company)
 
 (with-eval-after-load 'magik-mode
-  (message "TESTING HOOK ADDED")
   (add-hook 'magik-session-start-process-post-hook 'magik-company--kill-cb-ac-buffer))
 
 
@@ -44,6 +42,24 @@
 	(when magik-local-cb-ac-process
           (delete-process magik-local-cb-ac-process)
           (setq magik-company--cb-process nil)))))
+
+
+(dolist (entry '((dynamic . "symbol-event.svg")
+                 (exemplar . "symbol-class.svg")
+                 (slot  . "symbol-array.svg")
+                 (method  . "symbol-method.svg")
+                 (assign-method  . "symbol-method.svg")
+                 (condition  . "symbol-property.svg")
+                 (parameter  . "symbol-parameter.svg")
+                 (global  . "symbol-misc.svg")))
+  (magik-company--add-icon-to-alist (car entry) (cdr entry)))
+
+(defun magik-company--add-icon-to-alist (kind icon)
+  "Append a KIND to `company-vscode-icons-mapping` if it doesn't already exist."
+  (unless (assoc kind company-vscode-icons-mapping)
+    (setq company-vscode-icons-mapping
+          (append company-vscode-icons-mapping
+                  `((,kind . ,icon))))))
 
 (provide 'magik-company-extras)
 ;;; magik-company-extras.el ends here

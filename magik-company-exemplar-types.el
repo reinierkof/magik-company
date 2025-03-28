@@ -81,6 +81,37 @@ Each entry is a double: (TYPE REGEX).")
   (when-let ((method-param-type (magik-company--method-param-type variable)))
     method-param-type))
 
+(defun magik-company--method-param-type (param-name)
+  "Search for the param-name in a method comment block and return the type.
+PARAM-NAME ..."
+  (save-excursion
+    (let (start-loc method-loc)
+      (setq start-loc (point))
+      (setq method-loc (re-search-backward "\\(_method\\)" nil t))
+      ;; If _method is found, proceed to search for the @param and type
+      (if method-loc
+          (progn
+            (goto-char start-loc)
+            ;; Search for the @param with the given param-name
+            (if (re-search-backward
+                 (format "##\\s-*@param\\s-*{\\([^}]+\\)}\\s-*%s" (regexp-quote param-name))
+                 method-loc t)
+                (match-string 1)
+              nil))))))
+
+(defun magik-company--check-assignment-and-type (variable regex type)
+  "Check if VARIABLE matches a REGEX pattern in the buffer.
+If matched, return TYPE-OR-CLASS, otherwise nil."
+  (save-excursion
+    (if (re-search-backward (concat (regexp-quote variable) regex) nil t)
+        (progn
+            (if (stringp type)
+                type
+              (progn
+                (message "Warning: type-or-class is not a valid string, it's: %s" type)
+                nil)))
+      nil)))
+
 (defun magik-company--exemplar-near-point ()
   "Get current exemplar-type near cursor position."
   (save-excursion

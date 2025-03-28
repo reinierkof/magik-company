@@ -24,13 +24,24 @@
 ;;; Code:
 
 (require 'company)
-(require 'magik-company-cb)
 (require 'magik-company-annotation)
+(require 'magik-company-cb)
 (require 'magik-company-buffer-cache)
 (require 'magik-company-prefixes)
 (require 'magik-company-cb-cache)
 (require 'magik-company-exemplar-types)
 (require 'magik-company-yasnippet-handling)
+
+
+
+(defvar magik-company--objects-candidates nil)
+(defvar magik-company--globals-candidates nil)
+(defvar magik-company--conditions-candidates nil)
+(defvar magik-company--class-method-candidates nil)
+(defvar magik-company--params-candidates nil)
+(defvar magik-company--variables-candidates nil)
+(defvar magik-company--slots-candidates nil)
+(defvar magik-company--exemplar-candidate nil)
 
 (defgroup company-magik nil
   "Company back-end for Magik code completion."
@@ -46,7 +57,7 @@ COMMAND, ARG, IGNORED"
     (prefix (magik-company--prefix))
     (candidates (magik-company--candidates))
     (annotation (magik-company--annotation arg))
-    (kind nil)
+    (kind (magik-company--kind arg))
     (post-completion (magik-company--post-completion arg))
     )
   )
@@ -54,31 +65,57 @@ COMMAND, ARG, IGNORED"
 (defun magik-company--candidates ()
   "Generate a list of completion candidates."
   (magik-company--load-source-caches)
+  (magik-company--update-buffer-caches)
 
-  (let ((magik-candidates nil))
+  (let ((magik-candidates '()))
+    (when magik-company-prefix-at-slot
+      (setq magik-company--slots-candidates (magik-company--filter-candidates magik-company--slots-cache magik-candidates))
+      (setq magik-candidates (append magik-candidates magik-company--slots-candidates)))
+
     (when (or magik-company-prefix-at-globals
 	      magik-company-prefix-at-dynamics)
-      (setq magik-candidates (nconc magik-candidates magik-company--globals-source-cache)))
+      (setq magik-company--globals-candidates
+            (magik-company--filter-candidates magik-company--globals-source-cache magik-candidates))
+      (setq magik-candidates (append magik-candidates magik-company--globals-candidates)))
 
     (when magik-company-prefix-at-objects
-      (setq magik-candidates (nconc magik-candidates magik-company--objects-source-cache)))
+      (setq magik-company--objects-candidates (magik-company--filter-candidates magik-company--objects-source-cache magik-candidates))
+      (setq magik-candidates (append magik-candidates magik-company--objects-candidates))
+      
+      (setq magik-company--params-candidates (magik-company--filter-candidates magik-company--params-cache magik-candidates))
+      (setq magik-candidates (append magik-candidates magik-company--params-candidates))
+
+      (setq magik-company--variables-candidates (magik-company--filter-candidates magik-company--variables-cache magik-candidates))
+      (setq magik-candidates (append magik-candidates magik-company--variables-candidates))
+
+      (setq magik-company--exemplar-candidate (magik-company--filter-candidates magik-company--classname-cache magik-candidates))
+      (setq magik-candidates (append magik-candidates magik-company--exemplar-candidate)))
 
     (when magik-company-prefix-at-methods
-      (message "is prefix: %s, the same as magik-prefix: %s" prefix magik-company-cur-prefix)
-      (setq magik-candidates (nconc magik-candidates
-				     (magik-company--method-candidates magik-company-cur-prefix))))
+      (setq magik-company--class-method-candidates (magik-company--filter-candidates (magik-company--method-candidates magik-company-cur-prefix) magik-candidates))
+      (setq magik-candidates (append magik-candidates magik-company--class-method-candidates)))
 
     (when magik-company-prefix-at-conditions
-      (setq magik-candidates (nconc magik-candidates magik-company--conditions-source-cache)))
-
-    (dolist (candidate candidates)
-      (when (magik-company--add-yasnippet-text-property candidate)
-	))
+      (setq magik-company--conditions-candidates (magik-company--filter-candidates magik-company--conditions-source-cache magik-candidates))
+      (setq magik-candidates (append magik-candidates magik-company--conditions-candidates)))
+    
+    (dolist (candidate magik-candidates)
+      (magik-company--add-yasnippet-text-property candidate)
+	)
 
     ;; should not contain duplicates, because the filter takes it out.
     ;; incase we need it we can use this one.
     ;; (setq magik-candidates (delete-dups magik-candidates))
     magik-candidates))
+
+(defun magik-company--filter-candidates (new-candidates existing-candidates)
+  "Filter NEW-CANDIDATES to include only those that start with magik current prefix
+and are not already present in EXISTING-CANDIDATES."
+  (or (cl-remove-if-not (lambda (candidate)
+                           (and (string-prefix-p magik-company-cur-prefix candidate)
+                                (not (member candidate existing-candidates))))
+                         new-candidates)
+      '()))
 
 (defun magik-company--post-completion (candidate)
   "Insert parameters in snippet for CANDIDATE."
@@ -88,12 +125,9 @@ COMMAND, ARG, IGNORED"
   )
 
 
-;; (defun magik-company--kind (candidate)
-;;   (cond
-;;    ((member candidate magik-company--objects-candidates)  'variable)
-;;    ((member candidate magik-company--globals-candidates) (if (string-prefix-p "!" candidate) 'event 'field))
-;;    ((member candidate magik-company--conditions-candidates)  'property)
-;;    ((member candidate magik-company--class-method-candidates) 'method)
-;;    (t nil)))
+(defun magik-company--kind (candidate)
+  "retrieve the kind."
+  (get-text-property 0 'kind candidate))
+  
 (provide 'magik-company)
 ;;; magik-company.el ends here

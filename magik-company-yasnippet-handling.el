@@ -24,15 +24,16 @@
 
 ;;; Code:
 (require 'yasnippet)
-(defvar magik-company-insert-optional-params nil)
-(defvar magik-company-insert-gather-param nil)
-(defvar magik-company-insert-params nil)
+(defvar magik-company-insert-optional-params t)
+(defvar magik-company-insert-gather-param t)
+(defvar magik-company-insert-params t)
 
 (defun magik-company--add-yasnippet-text-property(candidate)
-"If there is a snippet for CANDIDATE add a text property."
-(when (magik-company--candidate-is-yasnippet candidate)
-  (put-text-property 0 (length candidate) 'yasnippet t candidate)
-  ))
+  "If there is a snippet for CANDIDATE add a text property."
+  (when (and (not (get-text-property 0 'yasnippet candidate))
+	     (magik-company--candidate-is-yasnippet candidate))
+    (put-text-property 0 (length candidate) 'yasnippet t candidate)
+    ))
 
 (defun magik-company--insert-param-yasnippet (list)
   "Insert a param yasnippet from LIST, each param is a tab and ends after the ')'."
@@ -69,6 +70,7 @@
 Insert them depending on settings."
   (let ((arguments-to-insert nil))
     (when magik-company-insert-params
+      (when (magik-company--candidate-is-method candidate)
       (setq arguments-to-insert (nconc arguments-to-insert
 				       (get-text-property 0 'arguments candidate)))
       (when magik-company-insert-optional-params
@@ -77,7 +79,14 @@ Insert them depending on settings."
       (when (and magik-company-insert-gather-param (get-text-property 0 'gather candidate))
 	(setq arguments-to-insert (nconc arguments-to-insert (list "gather"))))
       (magik-company--insert-param-yasnippet arguments-to-insert)
-      )))
+      ))))
+
+(defun magik-company--candidate-is-method(candidate)
+  t)
+  ;; (let ((a-kind (get-text-property 0 'kind candidate)))
+  ;;   (or (eq a-kind 'method)
+  ;; 	(eq a-kind 'assign-method)
+  ;;   )))
 
 (provide 'magik-company-yasnippet-handling)
 ;;; magik-company-yasnippet-handling.el ends here

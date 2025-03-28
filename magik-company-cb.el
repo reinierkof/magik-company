@@ -1,4 +1,4 @@
-;;; magik-cb-ac.el --- ;;; magik-cb-ac.el --- Magik Classbrowser Autocomplete Support
+;;; magik-company-cb.el --- ;;; magik-company-cb.el --- Magik Classbrowser company Support
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@
 (require 'magik-session)
 (require 'magik-company-extras)
 
-(defvar magik-company--cb-prefix nil)
-(defvar magik-company--cb-class-method-prefix nil)
 (defvar magik-company--cb-max-methods 1000)
 
 (defun magik-company--cb-filter (p s)
@@ -82,9 +80,13 @@ Stores the buffer name in `magik-company--cb-gis-buffer-name`
 (defun magik-company--cb-candidate-methods ()
   "Return candidate methods matching `ac-prefix' from Method finder output."
   ;;TODO combine method definition with its signature.
-  (let ((method magik-company--cb-prefix)
+  (let ((method (car nil))
+	(class (cdr nil))
         (ac-limit magik-company--cb-max-methods))
-    (setq method (regexp-quote method))
+        (setq method
+          (if (zerop (length method))
+              "\\sw"
+            (regexp-quote method)))
     (let ((i 0)
           (regexp (concat "^\\(" method "\\S-*\\)" magik-cb-in-keyword "\\(\\S-+\\)\\s-+\\(.*\\)\n\\(.*\n\\)\n\\(\\( +##.*\n\\)*\\)"))
           candidate
@@ -150,20 +152,21 @@ Stores the buffer name in `magik-company--cb-gis-buffer-name`
   (let ((i 0)
         (regexp (concat "\\(\\S-+:\\)\\(\\S-+\\)")) ; capture class name and its package
         candidate
-        candidates)
+        candidates
+	package)
     (goto-char (point-min))
     (save-match-data
       (while (re-search-forward regexp nil t)
         (setq candidate (match-string-no-properties 2))
-	(put-text-property 0 (length candidate)
-			   'package (match-string-no-properties 1)
-			   candidate)
+	(setq package (match-string-no-properties 1))
+	(setq package (substring package 0 (1- (length package))))
+	(put-text-property 0 (length candidate)  'kind 'exemplar candidate)
+	(put-text-property 0 (length candidate)  'package package candidate)
         (save-match-data
-          (if (member candidate candidates)
-              nil ; already present
-            (setq candidates (append (list candidate) candidates)
-                  i (1+ i)))))
-      (nreverse candidates))))
+          ;; Use cl-pushnew to prevent duplicates
+          (cl-pushnew candidate candidates :test 'equal)
+          (setq i (1+ i))))
+      candidates)))
 
 (defun magik-company--cb-add-method-properties (candidate class args classify documentation)
   "Return method documentation string.
@@ -220,32 +223,31 @@ DOCUMENTATION ..."
 
       ((equal class "<global>")
        ;; Global class is either a dynamic or a global proc
-	 (if signature-p
+	 (if (string-prefix-p "!" candidate)
 	     (put-text-property 0 candidate-length 'kind 'dynamic candidate)
 	     (put-text-property 0 candidate-length 'kind 'global candidate)))
 
       ;; No signs after the method
       ((not signature-p)
-       (put-text-property 0 candidate-length 'kind 'slot candidate))
+       (put-text-property 0 candidate-length 'kind 'method candidate))
 
       ;; handles normal methods
       ;; Still need to find a way to have start signature in the candidate.
       ((equal (substring signature 0 1) "(")
-       (add-text-properties 0 candidate-length `(kind 'method
-						 start-signature "("
-						 end-signature ,(substring signature 1)
-						 )
-			    candidate ))
+       (put-text-property 0 candidate-length 'kind 'method candidate)
+       (put-text-property 0 candidate-length 'start-signature "(" candidate)
+       (put-text-property 0 candidate-length 'end-signature (substring signature 1) candidate)
+					       )
       (assignment
-       (add-text-properties 0 candidate-length '(kind 'assignment-method
-						 assign-signature signature)
-			    candidate)))))
+       (put-text-property 0 candidate-length 'kind 'assignment-method candidate)
+       (put-text-property 0 candidate-length 'assign-signature signature candidate)
+       ))))
 
 (defun magik-company--cb-method-candidates (prefix)
   "Return list of methods for a class matching PREFIX for auto-complete mode.
 PREFIX is of the form \"CLASS\".\"METHOD_NAME_PREFIX\""
   (let ((magik-cb--ac-candidates 'unset) ; use 'unset symbol since nil is also a valid return value.
-        (ac-limit 100000)
+        (ac-limit 1000)
         class method character)
     (save-match-data
       (cond ((null magik-company--cb-process)
@@ -255,7 +257,6 @@ PREFIX is of the form \"CLASS\".\"METHOD_NAME_PREFIX\""
             (t
              (setq class (match-string-no-properties 1 prefix)
                    method (match-string-no-properties 2 prefix)
-		   magik-company--cb-prefix (match-string-no-properties 2 prefix)
                    character (if (equal method "") method (substring method 0 1)))
              (process-send-string magik-company--cb-process
                                   (concat "method_name ^" character "\n"
@@ -281,6 +282,5 @@ PREFIX is of the form \"CLASS\".\"METHOD_NAME_PREFIX\""
 	     (sleep-for 0.1))))
     magik-cb--ac-candidates))
 
-
-(provide 'magik-cb-ac.el)
-;;; magik-cb-ac.el ends here
+(provide 'magik-company-cb)
+;;; magik-company-cb.el ends here
