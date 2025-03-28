@@ -31,7 +31,6 @@
 (defun magik-company--annotation (candidate)
   "Create an annotation based on parameters of CANDIDATE."
 (let ((a-kind (get-text-property 0 'kind candidate)))
-    (message "a-kind: %s" a-kind)  ;; Debugging
     (if (and a-kind
              (eq a-kind 'exemplar)) 
         (let ((package (get-text-property 0 'package candidate)))

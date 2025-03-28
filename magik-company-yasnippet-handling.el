@@ -82,11 +82,11 @@ Insert them depending on settings."
       ))))
 
 (defun magik-company--candidate-is-method(candidate)
-  t)
-  ;; (let ((a-kind (get-text-property 0 'kind candidate)))
-  ;;   (or (eq a-kind 'method)
-  ;; 	(eq a-kind 'assign-method)
-  ;;   )))
+  (let ((a-kind (get-text-property 0 'kind candidate)))
+    (or (eq a-kind 'method)
+	(eq a-kind 'assign-method)
+	(eq a-kind 'global)
+    )))
 
 (provide 'magik-company-yasnippet-handling)
 ;;; magik-company-yasnippet-handling.el ends here
