@@ -127,7 +127,10 @@ and are not already present in EXISTING-CANDIDATES."
 
 (defun magik-company--kind (candidate)
   "retrieve the kind."
-  (get-text-property 0 'kind candidate))
+  (if (get-text-property 0 'yasnippet candidate)
+      'snippet
+    (get-text-property 0 'kind candidate))
+  )
   
 (provide 'magik-company)
 ;;; magik-company.el ends here

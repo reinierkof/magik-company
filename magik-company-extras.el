@@ -43,6 +43,12 @@
           (delete-process magik-local-cb-ac-process)
           (setq magik-company--cb-process nil)))))
 
+(defun magik-company--add-icon-to-alist (kind icon)
+  "Append a KIND to `company-vscode-icons-mapping` if it doesn't already exist."
+  (unless (assoc kind company-vscode-icons-mapping)
+    (setq company-vscode-icons-mapping
+          (append company-vscode-icons-mapping
+                  `((,kind . ,icon))))))
 
 (dolist (entry '((dynamic . "symbol-event.svg")
                  (exemplar . "symbol-class.svg")
@@ -54,12 +60,7 @@
                  (global  . "symbol-misc.svg")))
   (magik-company--add-icon-to-alist (car entry) (cdr entry)))
 
-(defun magik-company--add-icon-to-alist (kind icon)
-  "Append a KIND to `company-vscode-icons-mapping` if it doesn't already exist."
-  (unless (assoc kind company-vscode-icons-mapping)
-    (setq company-vscode-icons-mapping
-          (append company-vscode-icons-mapping
-                  `((,kind . ,icon))))))
+
 
 (provide 'magik-company-extras)
 ;;; magik-company-extras.el ends here
