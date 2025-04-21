@@ -1,6 +1,6 @@
 ;;; magik-company-buffer-cache.el --- Contains the methods to retrieve the parameters & slots from the current buffer  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2025  
+;; Copyright (C) 2025
 
 ;; Author:  <reinier.koffijberg@RDS>
 ;; Keywords: lisp
@@ -20,7 +20,7 @@
 
 ;;; Commentary:
 
-;; 
+;;
 
 ;;; Code:
 (require 'magik-mode)
@@ -36,68 +36,78 @@
   "docs."
   (when (/= magik-company--last-line-number (line-number-at-pos))
     (setq magik-company--last-line-number (line-number-at-pos))
-    (magik-company--load-params-cache)	
+    (magik-company--load-params-cache)
     (magik-company--load-variables-cache)
     (magik-company--load-slots-cache)
     (magik-company--load-classname-cache)
-  ))
+    ))
 
 (defun magik-company--load-params-cache ()
   "Load method parameters into the cache and add the parameter kind property."
   (setq magik-company--params-cache
-        (mapcar (lambda (el) (propertize el 'kind 'parameter))
-                (magik-company--method-parameters))))
+	(mapcar (lambda (el) (propertize el 'kind 'parameter))
+		(magik-company--method-parameters))))
 
 (defun magik-company--load-variables-cache ()
   "Load local variables into the cache and add the variable kind property."
   (setq magik-company--variables-cache
-        (mapcar (lambda (el) (propertize el 'kind 'variable))
-                (magik-company--local-variables))))
+	(mapcar (lambda (el) (propertize el 'kind 'variable))
+		(magik-company--local-variables))))
 
 (defun magik-company--load-slots-cache ()
   "Load exemplar slots into the cache and add the slot kind property."
   (setq magik-company--slots-cache
-        (mapcar (lambda (el) (propertize el 'kind 'slot))
-                (magik-company--exemplar-slots))))
+	(mapcar (lambda (el) (propertize el 'kind 'slot))
+		(magik-company--exemplar-slots))))
 
 (defun magik-company--load-classname-cache ()
   "Load the previous class name into the cache and add the exemplar kind property."
   (setq magik-company--classname-cache
-        (mapcar (lambda (el) (propertize el 'kind 'exemplar))
-                (list (magik-yasnippet-prev-class-name)))))
+	(mapcar (lambda (el) (propertize el 'kind 'exemplar))
+		(list (magik-yasnippet-prev-class-name)))))
 
 
 (defun magik-company--local-variables ()
-  ""
+  "Gather local variables in the current scope."
   (let ((variables '())
-	(more-vars t)
-	(var-count 1)
-	scope-loc endscope-loc)
-    (save-excursion
-      (setq scope-loc (or (when (re-search-backward "\\(_method\\)" nil t)
-			    (match-beginning 0))
-			  (when (re-search-backward "\\(_block\\)" nil t)
-			  (match-beginning 0))))
-      (when scope-loc
-	(setq endscope-loc (or (when (re-search-forward "\\(_endmethod\\)" nil t)
-				 (match-beginning 0))
-			       (when (re-search-forward "\\(_endblock\\)" nil t)
-				 (match-beginning 0))))
-	(when endscope-loc
-	  (while more-vars
-	    (goto-char scope-loc)
-	    (if (re-search-forward "\\(\\sw+\\)\\s-*<<" endscope-loc t var-count)
-		(progn
-		  (setq var-count (+ 1 var-count))
-		  (cl-pushnew (match-string 1) variables))
-	      (setq more-vars nil))
-	    ))))
+	(scopes (magik-company--scope-locations)))
+    (message "%s" scopes)
+    (when scopes
+      (save-excursion
+	(goto-char (nth 1 scopes))
+	(while (re-search-forward "\\(\\sw+\\)\\s-*<<" (nth 2 scopes) t)
+	  (cl-pushnew (match-string 1) variables))))
     variables))
+
+(defun magik-company--scope-locations()
+  "Closest scope start and end locations, can be block proc or method."
+  (let ((scope-start-loc
+	 (find-position #'re-search-backward #'max "_method" "_block" "_proc"))
+	(scope-end-loc
+	 (find-position #'re-search-forward #'min "_endmethod" "_endblock" "_endproc")))
+    (if (or (= scope-start-loc (point))
+	    (= scope-end-loc (point)))
+	nil
+      (list t scope-start-loc scope-end-loc)
+      )))
+
+(defun find-position (search-fn agg-fn &rest patterns)
+  "Does a couple re-searches and if found takes the aggregate function of it.
+In my case used for min and max"
+  (save-excursion
+    (let ((positions
+	   (delq nil (mapcar (lambda (pat)
+			       (save-excursion
+				 (when (funcall search-fn pat nil t)
+				   (match-beginning 0))))
+			     patterns))))
+      (if positions
+	  (apply agg-fn positions)
+	(point)))))
 
 (defun magik-company--method-parameters ()
   ""
-  (let ((start-loc (point))
-	(method-regex (cdr (assoc "method-with-arguments" magik-regexp)))
+  (let ((method-regex (cdr (assoc "method-with-arguments" magik-regexp)))
 	(assignment-regex (cdr (assoc "assignment-method" magik-regexp)))
 	params method-loc)
     (save-excursion
@@ -114,16 +124,14 @@
       (setq params (mapcar #'string-trim (split-string params "," t)))
       (setq params (cl-remove-if (lambda (param)
 				   (or (string-suffix-p "_optional" param)
-                                       (string-suffix-p "_gather" param)))
+				       (string-suffix-p "_gather" param)))
 				 params)))
 
     params))
 
 (defun magik-company--exemplar-slots ()
-  ""
-  (let ((more-slots t)
-	(slots '())
-	(slot-count 1)
+  "Retrieve the slots from a exemplar or mixin."
+  (let ((slots '())
 	slotted-loc dollar-loc)
     (save-excursion
       (setq slotted-loc (or (when (re-search-backward "\\(def_slotted_exemplar\\)" nil t)
@@ -137,13 +145,10 @@
 	(setq dollar-loc (when (re-search-forward "\\(\\$\\)" nil t)
 			   (match-beginning 0)))
 	(when dollar-loc
-	  (while more-slots
-	    (goto-char slotted-loc)
-		       (if (re-search-forward "{\\s-*:\\(\\sw+\\)\\s-*,\\s-*\\(_unset\\)\\s-*}" dollar-loc t slot-count)
-			   (progn
-			     (setq slot-count (+ 1 slot-count))
-			     (push (match-string 1) slots))
-			 (setq more-slots nil))))))
+	  (goto-char slotted-loc)
+	  (while (re-search-forward "{\\s-*:\\(\\sw+\\)\\s-*,\\s-*\\(_unset\\)\\s-*}" dollar-loc t)
+	    (push (match-string 1) slots))
+	  )))
     slots))
 
 (provide 'magik-company-buffer-cache)
