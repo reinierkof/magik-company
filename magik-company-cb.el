@@ -104,6 +104,7 @@ Stores the buffer name in `magik-company--cb-gis-buffer-name`
                 classify  (match-string-no-properties 3)
                 args      (magik-company--cb-method-args (match-beginning 4))
                 documentation (match-string-no-properties 5))
+	  ;;(message "can: %s cl1: %s cl2: %s doc: %s" candidate class classify args documentation)
 	  (magik-company--cb-add-method-properties candidate class args classify documentation)
 
           (if (member candidate candidates)
@@ -188,6 +189,7 @@ DOCUMENTATION ..."
     ;; We don't do anything with, irrelevant.
     (cond ((zerop (length classify))
            ;;do nothing
+	   ;; clasify also contains (iter)
            nil)
           ((equal (substring classify 0 1) "A")
            (setq classify (concat "Advanced" (substring classify 1))))
@@ -262,7 +264,7 @@ PREFIX is of the form \"CLASS\".\"METHOD_NAME_PREFIX\""
                                   (concat "method_name ^" character "\n"
                                           "unadd class \nadd class " class "\n"
                                           "method_cut_off " (number-to-string ac-limit) "\n"
-                                          "override_flags\nshow_classes\nshow_args\nshow_comments\nprint_curr_methods\n"))
+                                          "override_flags\nshow_classes\nshow_args\nshow_comments\nprint_curr_methods\nshow_topics\n"))
              (while (and (eq magik-cb--ac-candidates 'unset)
                          (magik-cb-is-running nil magik-company--cb-process))
                (sleep-for 0.1))
