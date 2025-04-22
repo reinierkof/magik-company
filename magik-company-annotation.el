@@ -44,7 +44,8 @@
 			    (let ((args (delq nil (apply #'append param-functions))))
 			      (when args
 				(concat "<" (mapconcat #'identity args ", ") ">")))))))
-    (when (get-text-property 0 'iter candidate) (concat "(I) " result))
+    (when (get-text-property 0 'iter candidate) (setq result (concat "(I) " result)))
+    result
     ))
 
 
