@@ -1,6 +1,6 @@
 ;;; magik-company-yasnippet-handling.el --- Contains the functions related to completing with yasnippets and recognizing whether a candidate is a yasnippet.  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2025  
+;; Copyright (C) 2025
 
 ;; Author:  <reinier.koffijberg@RDS>
 ;; Keywords: lisp
@@ -20,7 +20,7 @@
 
 ;;; Commentary:
 
-;; 
+;;
 
 ;;; Code:
 (require 'yasnippet)
@@ -39,23 +39,23 @@
   "Insert a param yasnippet from LIST, each param is a tab and ends after the ')'."
   (if (eq (char-before) ?\))
       (progn
-        (delete-char -1)
-        (yas-expand-snippet
-         (concat (mapconcat (lambda (param) (format "${%s}" param)) list ", ") ")$0")
-         ))
+	(delete-char -1)
+	(yas-expand-snippet
+	 (concat (mapconcat (lambda (param) (format "${%s}" param)) list ", ") ")$0")
+	 ))
     (progn
       (yas-expand-snippet
-         (concat (concat "(" (mapconcat (lambda (param) (format "${%s}" param)) list ", ") ")$0"))
-      ))))
+       (concat (concat "(" (mapconcat (lambda (param) (format "${%s}" param)) list ", ") ")$0"))
+       ))))
 
 (defun magik-company--candidate-is-yasnippet (key)
   "Get the snippet called KEY in MODE's tables."
   (interactive)
   (let ((yas-choose-tables-first nil)
-        (yas-choose-keys-first nil))
+	(yas-choose-keys-first nil))
     (cl-find key (yas--all-templates
-                  (yas--get-snippet-tables major-mode))
-             :key #'yas--template-key :test #'string=))
+		  (yas--get-snippet-tables major-mode))
+	     :key #'yas--template-key :test #'string=))
   )
 
 (defun magik-company--insert-candidate-yasnippet(candidate)
@@ -71,22 +71,22 @@ Insert them depending on settings."
   (let ((arguments-to-insert nil))
     (when magik-company-insert-params
       (when (magik-company--candidate-is-method candidate)
-      (setq arguments-to-insert (nconc arguments-to-insert
-				       (get-text-property 0 'arguments candidate)))
-      (when magik-company-insert-optional-params
 	(setq arguments-to-insert (nconc arguments-to-insert
-					 (get-text-property 0 'optional candidate))))
-      (when (and magik-company-insert-gather-param (get-text-property 0 'gather candidate))
-	(setq arguments-to-insert (nconc arguments-to-insert (list "gather"))))
-      (magik-company--insert-param-yasnippet arguments-to-insert)
-      ))))
+					 (get-text-property 0 'arguments candidate)))
+	(when magik-company-insert-optional-params
+	  (setq arguments-to-insert (nconc arguments-to-insert
+					   (get-text-property 0 'optional candidate))))
+	(when (and magik-company-insert-gather-param (get-text-property 0 'gather candidate))
+	  (setq arguments-to-insert (nconc arguments-to-insert (list "gather"))))
+	(magik-company--insert-param-yasnippet arguments-to-insert)
+	))))
 
 (defun magik-company--candidate-is-method(candidate)
   (let ((a-kind (get-text-property 0 'kind candidate)))
     (or (eq a-kind 'method)
 	(eq a-kind 'assign-method)
 	(eq a-kind 'global)
-    )))
+	)))
 
 (provide 'magik-company-yasnippet-handling)
 ;;; magik-company-yasnippet-handling.el ends here

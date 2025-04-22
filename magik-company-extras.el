@@ -1,6 +1,6 @@
 ;;; magik-company-extras.el --- This file adds hooks and session names for the classbrowser to start to the original magik-mode.  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2025  
+;; Copyright (C) 2025
 
 ;; Author:  <reinier.koffijberg@RDS>
 ;; Keywords: lisp
@@ -20,7 +20,7 @@
 
 ;;; Commentary:
 
-;; 
+;;
 
 ;;; Code:
 (require 'company)
@@ -37,27 +37,27 @@
 
 (defun magik-company--kill-cb-ac-buffer ()
   "Try to kill the magik-company buffer when starting a session."
-    (when (get-buffer magik-session-cb-ac-buffer)
-      (let ((magik-local-cb-ac-process (get-buffer-process (get-buffer magik-session-cb-ac-buffer))))
-	(when magik-local-cb-ac-process
-          (delete-process magik-local-cb-ac-process)
-          (setq magik-company--cb-process nil)))))
+  (when (get-buffer magik-session-cb-ac-buffer)
+    (let ((magik-local-cb-ac-process (get-buffer-process (get-buffer magik-session-cb-ac-buffer))))
+      (when magik-local-cb-ac-process
+	(delete-process magik-local-cb-ac-process)
+	(setq magik-company--cb-process nil)))))
 
 (defun magik-company--add-icon-to-alist (kind icon)
   "Append a KIND to `company-vscode-icons-mapping` if it doesn't already exist."
   (unless (assoc kind company-vscode-icons-mapping)
     (setq company-vscode-icons-mapping
-          (append company-vscode-icons-mapping
-                  `((,kind . ,icon))))))
+	  (append company-vscode-icons-mapping
+		  `((,kind . ,icon))))))
 
 (dolist (entry '((dynamic . "symbol-event.svg")
-                 (exemplar . "symbol-class.svg")
-                 (slot  . "symbol-array.svg")
-                 (method  . "symbol-method.svg")
-                 (assign-method  . "symbol-method.svg")
-                 (condition  . "symbol-property.svg")
-                 (parameter  . "symbol-parameter.svg")
-                 (global  . "symbol-misc.svg")))
+		 (exemplar . "symbol-class.svg")
+		 (slot  . "symbol-array.svg")
+		 (method  . "symbol-method.svg")
+		 (assign-method  . "symbol-method.svg")
+		 (condition  . "symbol-property.svg")
+		 (parameter  . "symbol-parameter.svg")
+		 (global  . "symbol-misc.svg")))
   (magik-company--add-icon-to-alist (car entry) (cdr entry)))
 
 

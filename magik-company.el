@@ -75,13 +75,13 @@ COMMAND, ARG, IGNORED"
     (when (or magik-company-prefix-at-globals
 	      magik-company-prefix-at-dynamics)
       (setq magik-company--globals-candidates
-            (magik-company--filter-candidates magik-company--globals-source-cache magik-candidates))
+	    (magik-company--filter-candidates magik-company--globals-source-cache magik-candidates))
       (setq magik-candidates (append magik-candidates magik-company--globals-candidates)))
 
     (when magik-company-prefix-at-objects
       (setq magik-company--objects-candidates (magik-company--filter-candidates magik-company--objects-source-cache magik-candidates))
       (setq magik-candidates (append magik-candidates magik-company--objects-candidates))
-      
+
       (setq magik-company--params-candidates (magik-company--filter-candidates magik-company--params-cache magik-candidates))
       (setq magik-candidates (append magik-candidates magik-company--params-candidates))
 
@@ -98,10 +98,10 @@ COMMAND, ARG, IGNORED"
     (when magik-company-prefix-at-conditions
       (setq magik-company--conditions-candidates (magik-company--filter-candidates magik-company--conditions-source-cache magik-candidates))
       (setq magik-candidates (append magik-candidates magik-company--conditions-candidates)))
-    
+
     (dolist (candidate magik-candidates)
       (magik-company--add-yasnippet-text-property candidate)
-	)
+      )
 
     ;; should not contain duplicates, because the filter takes it out.
     ;; incase we need it we can use this one.
@@ -112,9 +112,9 @@ COMMAND, ARG, IGNORED"
   "Filter NEW-CANDIDATES to include only those that start with magik current prefix
 and are not already present in EXISTING-CANDIDATES."
   (or (cl-remove-if-not (lambda (candidate)
-                           (and (string-prefix-p magik-company-cur-prefix candidate)
-                                (not (member candidate existing-candidates))))
-                         new-candidates)
+			  (and (string-prefix-p magik-company-cur-prefix candidate)
+			       (not (member candidate existing-candidates))))
+			new-candidates)
       '()))
 
 (defun magik-company--post-completion (candidate)
@@ -131,6 +131,6 @@ and are not already present in EXISTING-CANDIDATES."
       'snippet
     (get-text-property 0 'kind candidate))
   )
-  
+
 (provide 'magik-company)
 ;;; magik-company.el ends here
