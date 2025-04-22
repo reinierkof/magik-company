@@ -1,6 +1,6 @@
 ;;; magik-company-cb-cache.el --- Contains all the functionality to communicate with the class browser and the results are stored here.  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2025  
+;; Copyright (C) 2025
 
 ;; Author:  <reinier.koffijberg@RDS>
 ;; Keywords: lisp
@@ -41,14 +41,14 @@
   "Reset the caches such that they will refill upon triggering the prefix."
   (interactive)
   (setq magik-company--objects-source-cache-loaded nil
-        magik-company--globals-source-cache-loaded nil
-        magik-company--conditions-source-cache-loaded nil
-        )
+	magik-company--globals-source-cache-loaded nil
+	magik-company--conditions-source-cache-loaded nil
+	)
   )
 
 (defun magik-company--load-source-caches ()
   "Check if the source caches are loaded and do init if needed."
-    (when (not magik-company--objects-source-cache-loaded)
+  (when (not magik-company--objects-source-cache-loaded)
     (magik-company--objects-source-init))
 
   (when (not magik-company--globals-source-cache-loaded)
@@ -68,15 +68,15 @@ PREFIX ..."
   (let ((exemplar (magik-company--exemplar-near-point))
 	(short-prefix prefix))
     (if exemplar
+	(progn
+	  (setq short-prefix (concat exemplar "." (if (> (length short-prefix) 0) (substring short-prefix 0 1))))
+	  (if (not (and magik-company--class-method-source-cache
+			(equal (concat " " short-prefix) (car magik-company--class-method-source-cache))))
 	      (progn
-          (setq short-prefix (concat exemplar "." (if (> (length short-prefix) 0) (substring short-prefix 0 1))))
-          (if (not (and magik-company--class-method-source-cache
-                        (equal (concat " " short-prefix) (car magik-company--class-method-source-cache))))
-		          (progn
-                (when (magik-company--cb-start-process)
-		             (setq magik-company--class-method-source-cache (magik-company--cb-method-candidates short-prefix))))))))
-          magik-company--class-method-source-cache
-    )
+		(when (magik-company--cb-start-process)
+		  (setq magik-company--class-method-source-cache (magik-company--cb-method-candidates short-prefix))))))))
+  magik-company--class-method-source-cache
+  )
 
 (defun magik-company--objects-source-init (&optional reset)
   "Initialisation function for obtaining all Magik Objects for use in auto-complete-mode.
@@ -84,29 +84,29 @@ If RESET is true, the cache is regenerated."
   (when (magik-company--cb-start-process)
     (when (or (not magik-company--objects-source-cache-loaded) reset)
       (let ((prefix "sw:object"))
-        (setq magik-company--objects-source-cache (magik-company--cb-class-candidates prefix))
-        (setq magik-company--objects-source-cache-loaded t)))))
+	(setq magik-company--objects-source-cache (magik-company--cb-class-candidates prefix))
+	(setq magik-company--objects-source-cache-loaded t)))))
 
 (defun magik-company--globals-source-init (&optional reset)
   "Initialisation function for obtaining all Magik Conditions for use in auto-complete-mode.
 If RESET is true, the cache is regenerated."
-   (when (magik-company--cb-start-process)
+  (when (magik-company--cb-start-process)
     (when (or (not magik-company--globals-source-cache-loaded) reset)
       (let ((prefix "<global>."))
-        (setq magik-company--globals-source-cache (magik-company--cb-method-candidates prefix))
-        (setq magik-company--globals-source-cache-loaded t)))))
+	(setq magik-company--globals-source-cache (magik-company--cb-method-candidates prefix))
+	(setq magik-company--globals-source-cache-loaded t)))))
 
 (defun magik-company--conditions-source-init (&optional reset)
   "Initialisation function for obtaining all Magik Conditions for use in auto-complete-mode.
 If RESET is true, the cache is regenerated."
-   (when (magik-company--cb-start-process)
+  (when (magik-company--cb-start-process)
     (when (or (not magik-company--conditions-source-cache-loaded) reset)
       (let ((prefix "<condition>."))
-        (setq magik-company--conditions-source-cache (magik-company--cb-method-candidates prefix))
-        ;; adds an : infront so the prefix works with the results.
-        (setq magik-company--conditions-source-cache
-              (mapcar (lambda (item) (concat ":" item)) (magik-company--cb-method-candidates prefix)))
-        (setq magik-company--conditions-source-cache-loaded t)))))
+	(setq magik-company--conditions-source-cache (magik-company--cb-method-candidates prefix))
+	;; adds an : infront so the prefix works with the results.
+	(setq magik-company--conditions-source-cache
+	      (mapcar (lambda (item) (concat ":" item)) (magik-company--cb-method-candidates prefix)))
+	(setq magik-company--conditions-source-cache-loaded t)))))
 
 (provide 'magik-company-cb-cache)
 ;;; magik-company-cb-cache.el ends here

@@ -185,7 +185,7 @@ DOCUMENTATION ..."
 	 (signature (cdr method-signature))
 	 (signature-p (> (length signature) 0))
 	 assignment)
-    
+
     (cond ((zerop (length classify))
 	   ;; only check for iter
 	   ;; clasify also contains (iter)
