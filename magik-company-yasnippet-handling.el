@@ -37,16 +37,17 @@
 
 (defun magik-company--insert-param-yasnippet (list)
   "Insert a param yasnippet from LIST, each param is a tab and ends after the ')'."
-  (if (eq (char-before) ?\))
+  (when (not (null list))
+    (if (eq (char-before) ?\))
+	(progn
+	  (delete-char -1)
+	  (yas-expand-snippet
+	   (concat (mapconcat (lambda (param) (format "${%s}" param)) list ", ") ")$0")
+	   ))
       (progn
-	(delete-char -1)
 	(yas-expand-snippet
-	 (concat (mapconcat (lambda (param) (format "${%s}" param)) list ", ") ")$0")
-	 ))
-    (progn
-      (yas-expand-snippet
-       (concat (concat "(" (mapconcat (lambda (param) (format "${%s}" param)) list ", ") ")$0"))
-       ))))
+	 (concat (concat "(" (mapconcat (lambda (param) (format "${%s}" param)) list ", ") ")$0"))
+	 )))))
 
 (defun magik-company--candidate-is-yasnippet (key)
   "Get the snippet called KEY in MODE's tables."

@@ -71,7 +71,6 @@
   "Gather local variables in the current scope."
   (let ((variables '())
 	(scopes (magik-company--scope-locations)))
-    (message "%s" scopes)
     (when scopes
       (save-excursion
 	(goto-char (nth 1 scopes))

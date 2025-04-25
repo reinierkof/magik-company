@@ -55,15 +55,18 @@ S ..."
 Returns t if the process was started or running, nil if there's an error."
   (if magik-company--cb-process
       t
-    (let ((gis-buffer-name (magik-company--cb-get-gis-buffer)))
+    (let ((gis-buffer-name (magik-company--cb-get-gis-buffer))
+	  smallworld-gis)
       (if (not gis-buffer-name)
 	  nil
-	(setq magik-company--cb-process
-	      (magik-cb-get-process-create
-	       magik-session-cb-ac-buffer 'magik-company--cb-filter gis-buffer-name nil))
-	(if magik-company--cb-process
-	    t
-	  nil)))))
+	(progn
+	  (setq smallworld-gis (buffer-local-value 'magik-smallworld-gis (get-buffer gis-buffer-name)))
+		(setq magik-company--cb-process
+		      (magik-cb-get-process-create
+		       magik-session-cb-ac-buffer 'magik-company--cb-filter smallworld-gis gis-buffer-name nil)))
+	  (if magik-company--cb-process
+	      t
+	    nil)))))
 
 (defun magik-company--cb-get-gis-buffer ()
   "Find the gis buffer in current buffers if it is active.
@@ -104,7 +107,6 @@ Stores the buffer name in `magik-company--cb-gis-buffer-name`
 		classify  (match-string-no-properties 3)
 		args      (magik-company--cb-method-args (match-beginning 4))
 		documentation (match-string-no-properties 5))
-	  ;;(message "can: %s cl1: %s cl2: %s doc: %s" candidate class classify args documentation)
 	  (magik-company--cb-add-method-properties candidate class args classify documentation)
 
 	  (if (member candidate candidates)

@@ -74,9 +74,10 @@ PREFIX ..."
 			(equal (concat " " short-prefix) (car magik-company--class-method-source-cache))))
 	      (progn
 		(when (magik-company--cb-start-process)
-		  (setq magik-company--class-method-source-cache (magik-company--cb-method-candidates short-prefix))))))))
+		  (setq magik-company--class-method-source-cache (magik-company--cb-method-candidates short-prefix))))))
+      (setq magik-company--class-method-source-cache nil))
   magik-company--class-method-source-cache
-  )
+  ))
 
 (defun magik-company--objects-source-init (&optional reset)
   "Initialisation function for obtaining all Magik Objects for use in auto-complete-mode.
