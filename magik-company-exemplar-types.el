@@ -44,6 +44,7 @@ Each entry is a double: (TYPE REGEX).")
     (setq exemplar-type
 	  (or (magik-company--self-case variable)
 	      (magik-company--check-object-source variable)
+	      (magik-company--super-case variable)
 	      (magik-company--check-typed-assigned-patterns variable)
 	      (magik-company--check-class-assigned-patterns variable)
 	      (magik-company--check-typed-params variable)))
@@ -52,9 +53,15 @@ Each entry is a double: (TYPE REGEX).")
 (defun magik-company--self-case (variable)
   "Return the exemplar type if VARIABLE is '_self' or '_clone'."
   (when (or (equal variable "_self")
-	    (equal variable "_clone"))
+	    (equal variable "_clone")
+	    (equal variable "_super"))
     (or (cadr (magik-current-method-name))
 	(file-name-sans-extension (buffer-name)))))
+
+(defun magik-company--super-case (variable)
+  "Return the super exemplar type if variable is '_super'."
+  (when (string-match "_super(\\([a-zA-Z_]+\\))" variable)
+    (match-string 1 variable)))
 
 (defun magik-company--check-object-source (variable)
   "Return VARIABLE if it exists in `magik-company--objects-source-cache`."
