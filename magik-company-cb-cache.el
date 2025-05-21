@@ -37,12 +37,16 @@
 (defvar magik-company--conditions-source-cache nil)
 (defvar magik-company--class-method-source-cache nil)
 
-(defun magik-company-reload-cache ()
+(defun magik-company-reload-cache (&rest _args)
   "Reset the caches such that they will refill upon triggering the prefix."
   (interactive)
   (setq magik-company--objects-source-cache-loaded nil
 	magik-company--globals-source-cache-loaded nil
 	magik-company--conditions-source-cache-loaded nil
+	magik-company--objects-source-cache nil
+	magik-company--globals-source-cache nil
+	magik-company--conditions-source-cache nil
+	magik-company--class-method-source-cache nil
 	)
   )
 
@@ -76,8 +80,8 @@ PREFIX ..."
 		(when (magik-company--cb-start-process)
 		  (setq magik-company--class-method-source-cache (magik-company--cb-method-candidates short-prefix))))))
       (setq magik-company--class-method-source-cache nil))
-  magik-company--class-method-source-cache
-  ))
+    magik-company--class-method-source-cache
+    ))
 
 (defun magik-company--objects-source-init (&optional reset)
   "Initialisation function for obtaining all Magik Objects for use in auto-complete-mode.

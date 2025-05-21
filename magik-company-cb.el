@@ -24,6 +24,7 @@
 (require 'magik-company-extras)
 
 (defvar magik-company--cb-max-methods 1000)
+(defvar magik-company--session-running nil)
 
 (defun magik-company--cb-filter (p s)
   "Process data coming back from the CB auto-complete buffer.
@@ -53,20 +54,70 @@ S ..."
 (defun magik-company--cb-start-process ()
   "Start a Class Browser process for auto-complete-mode.
 Returns t if the process was started or running, nil if there's an error."
-  (if magik-company--cb-process
+  (if (process-live-p magik-company--cb-process)
       t
     (let ((gis-buffer-name (magik-company--cb-get-gis-buffer))
 	  smallworld-gis)
-      (if (not gis-buffer-name)
-	  nil
+      (when (and gis-buffer-name
+		 (or magik-company--session-running
+		     (magik-company--magik-process-started? gis-buffer-name)))
+	(setq smallworld-gis (buffer-local-value 'magik-smallworld-gis (get-buffer gis-buffer-name)))
+	(setq magik-company--cb-process
+	      (magik-cb-get-process-create
+	       magik-session-cb-ac-buffer 'magik-company--cb-filter smallworld-gis gis-buffer-name nil))
+	)
+      (if (process-live-p magik-company--cb-process)
+	  (progn
+	    (magik-company-reload-cache)
+	    t)
+	nil))))
+
+(defun magik-company--force-kill-cb-company-buffers ()
+  "Kill all buffers whose names start with *cb and end with company*.
+killing any associated processes without prompting."
+  (dolist (buf (buffer-list))
+    (let ((name (buffer-name buf)))
+      (when (and name
+		 (string-prefix-p "*cb" name)
+		 (string-suffix-p "company*" name))
+	(when-let ((proc (get-buffer-process buf)))
+	  (delete-process proc))
+	(kill-buffer buf)))))
+
+(with-eval-after-load 'magik-mode
+  (advice-add 'magik-transmit-region :after #'magik-company-reload-cache)
+  (advice-add 'magik-session-kill-process :after (lambda (&rest args)
+						   (setq magik-company--session-running nil)
+						   (magik-company-reload-cache)
+						   (magik-company--force-kill-cb-company-buffers))
+	      ))
+
+(defun magik-company--magik-process-started?(gis-buffer-name)
+  "Poke to the magik-process to see if it has started.
+ This is not a great solution because it might spam the terminal.
+For now it's the only way to know whether,
+ the process has loaded the method-finder etc."
+  (interactive)
+  (let ((smallworld-gis (get-buffer-process (get-buffer gis-buffer-name))))
+    (if smallworld-gis
 	(progn
-	  (setq smallworld-gis (buffer-local-value 'magik-smallworld-gis (get-buffer gis-buffer-name)))
-		(setq magik-company--cb-process
-		      (magik-cb-get-process-create
-		       magik-session-cb-ac-buffer 'magik-company--cb-filter smallworld-gis gis-buffer-name nil)))
-	  (if magik-company--cb-process
-	      t
-	    nil)))))
+	  ;; send some magik code to start the method finder.
+	  (process-send-string smallworld-gis "_if method_finder _isnt _unset\n_then\n  method_finder.lazy_start?\n_endif\n$\n")
+	  (with-current-buffer gis-buffer-name
+	    (goto-char (point-max))
+	    (let ((method-finder-pos (save-excursion (when (re-search-backward "method_finder: loaded" nil t)
+						       (match-beginning 0))))
+		  (magik-end-process-pos (save-excursion (when (re-search-backward "Process magik-session-process" nil t)
+							   (match-beginning 0)))))
+	      (if (and (number-or-marker-p method-finder-pos)
+		       (or (not (number-or-marker-p magik-end-process-pos))
+			   (> method-finder-pos magik-end-process-pos)))
+		  (progn (setq magik-company--session-running t)
+			 t)
+		nil
+		))))
+      nil)
+    ))
 
 (defun magik-company--cb-get-gis-buffer ()
   "Find the gis buffer in current buffers if it is active.

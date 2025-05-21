@@ -65,7 +65,8 @@ Each entry is a double: (TYPE REGEX).")
 
 (defun magik-company--check-object-source (variable)
   "Return VARIABLE if it exists in `magik-company--objects-source-cache`."
-  (when (member variable magik-company--objects-source-cache)
+  (when (and (listp magik-company--objects-source-cache)
+	     (member variable magik-company--objects-source-cache))
     variable))
 
 (defun magik-company--check-typed-assigned-patterns (variable)
