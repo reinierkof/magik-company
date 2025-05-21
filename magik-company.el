@@ -111,11 +111,13 @@ COMMAND, ARG, IGNORED"
 (defun magik-company--filter-candidates (new-candidates existing-candidates)
   "Filter NEW-CANDIDATES to include only those that start with magik current prefix
 and are not already present in EXISTING-CANDIDATES."
-  (or (cl-remove-if-not (lambda (candidate)
-			  (and (string-prefix-p magik-company-cur-prefix candidate)
-			       (not (member candidate existing-candidates))))
-			new-candidates)
-      '()))
+  (if (listp new-candidates)
+      (progn
+	(cl-remove-if-not (lambda (candidate)
+			    (and (string-prefix-p magik-company-cur-prefix candidate)
+				 (not (member candidate existing-candidates))))
+			  new-candidates))
+    '()))
 
 (defun magik-company--post-completion (candidate)
   "Insert parameters in snippet for CANDIDATE."
