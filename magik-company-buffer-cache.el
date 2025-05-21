@@ -24,6 +24,7 @@
 
 ;;; Code:
 (require 'magik-mode)
+(require 'magik-company-treesitter-extras)
 
 (defvar magik-company--params-cache nil)
 (defvar magik-company--variables-cache nil)
@@ -69,40 +70,8 @@
 
 (defun magik-company--local-variables ()
   "Gather local variables in the current scope."
-  (let ((variables '())
-	(scopes (magik-company--scope-locations)))
-    (when scopes
-      (save-excursion
-	(goto-char (nth 1 scopes))
-	(while (re-search-forward "\\(\\sw+\\)\\s-*<<" (nth 2 scopes) t)
-	  (cl-pushnew (match-string 1) variables))))
-    variables))
-
-(defun magik-company--scope-locations()
-  "Closest scope start and end locations, can be block proc or method."
-  (let ((scope-start-loc
-	 (find-position #'re-search-backward #'max "_method" "_block" "_proc"))
-	(scope-end-loc
-	 (find-position #'re-search-forward #'min "_endmethod" "_endblock" "_endproc")))
-    (if (or (= scope-start-loc (point))
-	    (= scope-end-loc (point)))
-	nil
-      (list t scope-start-loc scope-end-loc)
-      )))
-
-(defun find-position (search-fn agg-fn &rest patterns)
-  "Does a couple re-searches and if found takes the aggregate function of it.
-In my case used for min and max"
-  (save-excursion
-    (let ((positions
-	   (delq nil (mapcar (lambda (pat)
-			       (save-excursion
-				 (when (funcall search-fn pat nil t)
-				   (match-beginning 0))))
-			     patterns))))
-      (if positions
-	  (apply agg-fn positions)
-	(point)))))
+  (magik-company--ts-variables-in-scope)
+  )
 
 (defun magik-company--method-parameters ()
   ""
