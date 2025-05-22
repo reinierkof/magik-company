@@ -25,18 +25,21 @@
 ;;; Code:
 (require 'treesit)
 
-(defvar magik-company--ts-scope-keywords '("method" "block"))
+(defvar magik-company--ts-scope-keywords '("method" "block" "procedure"))
 
 
 (defun magik-company--ts-assignments-in-scope (node)
   "Assignments in a NODE."
   (let ((results '()))
-    (let ((stack (list node)))
-      (while stack
-	(let ((current (pop stack)))
-	  (when (string= (treesit-node-type current) "assignment")
-	    (push current results))
-	  (setq stack (append (treesit-node-children current) stack)))))
+    (when node
+      (let ((stack (treesit-node-children node)))
+	(while stack
+	  (let ((current (pop stack)))
+	    (when (string= (treesit-node-type current) "assignment")
+	      (push current results))
+	    (when (not (member (treesit-node-type current)
+			       magik-company--ts-scope-keywords))
+	      (setq stack (append (treesit-node-children current) stack)))))))
     (nreverse results))
   )
 
@@ -71,12 +74,28 @@
 	  (push child result))))
     (nreverse result)))
 
+(defun magik-company--ts-import-variables-in-scope (node variables)
+  "VARIABLES gained by the import statement in NODE."
+  (when node
+    (let ((stack (treesit-node-children node)))
+      (while stack
+	(let ((current (pop stack)))
+	  (when (string= (treesit-node-type current) "import")
+	    (push (substring-no-properties (treesit-node-text
+					    (nth 1 (treesit-node-children current))))
+		  variables))
+	  (when (not (member (treesit-node-type current)
+			     magik-company--ts-scope-keywords))
+	    (setq stack (append (treesit-node-children current) stack)))))))
+  variables)
+
 (defun magik-company--ts-variables-in-scope ()
   "Return a list of all variable nodes within the enclosing fragment scope."
   (interactive)
   (let ((variables '())
 	(scope (magik-company--ts-enclosing-scope)))
     (when scope
+      (setq variables (magik-company--ts-import-variables-in-scope scope variables))
       (dolist (a-node (magik-company--ts-assignments-in-scope scope))
 	(setq variables (magik-company--ts-lhs-variables-in-assignment-node a-node variables))
 	))
