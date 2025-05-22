@@ -1,8 +1,13 @@
-;;; rewrite-magik-company.el --- Magik backend for company-mode  -*- lexical-binding: t; -*-
+;;; magik-company.el --- Magik backend for company-mode
+
+;; Package-Version: 0.1.0
+;; Package-Requires: ((emacs "29.1") (magik-mode "0.4.1") (company) (yasnippet))
+;; URL: "https://github.com/reinierkof/magik-company"
+;; Keywords "company-backends")
 
 ;; Copyright (C) 2024 Reinier Koffijberg
 
-;; Author: Reinier Koffijberg <some@gmail.com>
+;; Author: Reinier Koffijberg <reinierkof@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

@@ -24,7 +24,7 @@
 
 ;;; Code:
 (require 'yasnippet)
-(defvar magik-company-insert-optional-params t)
+(defvar magik-company-insert-optional-params nil)
 (defvar magik-company-insert-gather-param t)
 (defvar magik-company-insert-params t)
 

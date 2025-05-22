@@ -114,7 +114,7 @@
 			   (match-beginning 0)))
 	(when dollar-loc
 	  (goto-char slotted-loc)
-	  (while (re-search-forward "{\\s-*:\\(\\sw+\\)\\s-*,\\s-*\\(_unset\\)\\s-*}" dollar-loc t)
+	  (while (re-search-forward "{\\s-*:\\(\\sw+\\)\\s-*,\\s-*\\(_unset\\)\\s-*" dollar-loc t)
 	    (push (match-string 1) slots))
 	  )))
     slots))
