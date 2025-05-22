@@ -38,11 +38,11 @@ magik-company-reload-cache can be used to manually refresh the cache.
 When a yasnippet is found it is automatically completed when the autocomplete is done.
 When a method is completed the parameters are automatically inserted as yasnippet (optional can be toggeled)
 
-### variables
+### Variables
 all variables that are assigned with "<<" in your current scope are available for completion
 Parameters will also be seen as variables within a scope.
 
-### methods
+### Methods
 When a type is available all methods on this type are available
 The type is available when:
 - _self is used within a method and the exemplar is loaded in the session
@@ -51,10 +51,10 @@ The type is available when:
 - a variable assigned by one of the basic types: {integer, float, char16_vector, simple_vector}
 - a variable assigned with a new* method
 
-### objects
+### Objects
 All loaded in exemplars will be available as objects.
 
-### slots
+### Slots
 Slots defined in the current file in the nearest exemplar (to be improved).
 
 ## Limitations
