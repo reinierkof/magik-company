@@ -34,6 +34,10 @@ Caching is used to minimalize the usage of your local resources.
 Any time one transmits to magik (buffer or local) the cache is refreshed.
 magik-company-reload-cache can be used to manually refresh the cache.
 
+### Yasnippet completion
+When a yasnippet is found it is automatically completed when the autocomplete is done.
+When a method is completed the parameters are automatically inserted as yasnippet (optional can be toggeled)
+
 ### variables
 all variables that are assigned with "<<" in your current scope are available for completion
 Parameters will also be seen as variables within a scope.
@@ -51,9 +55,10 @@ The type is available when:
 All loaded in exemplars will be available as objects.
 
 ### slots
-Slots defined in the current file on the current exemplar in scope will be available as slots.
+Slots defined in the current file in the nearest exemplar (to be improved).
 
 ## Limitations
 
 Currently this is bound to one session, when there are multiple sessions running there is no control over which session is being used.
 Magik is soft typed so quite often it is hard to determine the current exemplar to use for completion.
+Slots are only recognised in the nearest exemplar, and this is not checked whether it is the same exemplar
