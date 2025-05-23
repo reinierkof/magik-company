@@ -52,6 +52,25 @@
       (setq node (treesit-node-parent node)))
     node))
 
+(defun magik-company--ts-enclosing-method ()
+  "Return the enclosing node of type method."
+  (let ((node (treesit-node-at (point))))
+    (while (and node
+		(not (string= (treesit-node-type node) "method")))
+      (setq node (treesit-node-parent node)))
+    node))
+
+(defun magik-company--ts-exemplar-of-enclosing-method ()
+  "Return the exemplar name of the enclosing method."
+  (let ((node (magik-company--ts-enclosing-method)))
+    (when node
+      (let ((results-node
+	     (cdr (assoc 'exemplar
+			 (treesit-query-capture node "(method exemplarname: (identifier) @exemplar)")))))
+	(when results-node
+	  (substring-no-properties (treesit-node-text results-node))
+	  )))))
+
 (defun magik-company--ts-lhs-variables-in-assignment-node(node variables)
   "Lhs variables of an assignment NODE added in VARIABLES list."
   (let ((stack (magik-company--ts-children-before-assignment node)))
