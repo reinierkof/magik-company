@@ -122,6 +122,27 @@
 	  (push (substring-no-properties (treesit-node-text child)) variables)))))
   variables)
 
+(defun magik-company--ts-exemplar-node-in-buffer-for (exemplar-name)
+  "Exemplar node in buffer for EXEMPLAR-NAME."
+  (cdr (assoc 'exemplar-node (treesit-query-capture
+                              (treesit-buffer-root-node)
+                              (format
+                               "
+((invoke receiver: (variable) @var (symbol) @sym) @exemplar-node
+(#match %S @var) (#match %S @sym))"
+                               "^def_slotted_exemplar$"
+                               (concat "^:" exemplar-name "$"))))))
+
+(defun magik-company--ts-current-exemplar-node-with-locs ()
+  "Exemplar node with the locations."
+  (let* ((exemplar-node (magik-company--ts-exemplar-node-in-buffer-for
+                         (magik-company--ts-exemplar-of-enclosing-method)))
+         (start-loc (and exemplar-node (treesit-node-start exemplar-node)))
+         (end-loc (and exemplar-node (treesit-node-end exemplar-node))))
+    `((:node . ,exemplar-node)
+      (:start . ,start-loc)
+      (:end . ,end-loc))))
+
 (defun magik-company--ts-variables-in-scope ()
   "Return a list of all variable nodes within the enclosing fragment scope."
   (interactive)
