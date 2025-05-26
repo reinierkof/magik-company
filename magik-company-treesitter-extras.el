@@ -52,6 +52,25 @@
       (setq node (treesit-node-parent node)))
     node))
 
+(defun magik-company--ts-enclosing-method ()
+  "Return the enclosing node of type method."
+  (let ((node (treesit-node-at (point))))
+    (while (and node
+		(not (string= (treesit-node-type node) "method")))
+      (setq node (treesit-node-parent node)))
+    node))
+
+(defun magik-company--ts-exemplar-of-enclosing-method ()
+  "Return the exemplar name of the enclosing method."
+  (let ((node (magik-company--ts-enclosing-method)))
+    (when node
+      (let ((results-node
+	     (cdr (assoc 'exemplar
+			 (treesit-query-capture node "(method exemplarname: (identifier) @exemplar)")))))
+	(when results-node
+	  (substring-no-properties (treesit-node-text results-node))
+	  )))))
+
 (defun magik-company--ts-lhs-variables-in-assignment-node(node variables)
   "Lhs variables of an assignment NODE added in VARIABLES list."
   (let ((stack (magik-company--ts-children-before-assignment node)))
@@ -102,6 +121,27 @@
 		   (string= (treesit-node-type child) "identifier"))
 	  (push (substring-no-properties (treesit-node-text child)) variables)))))
   variables)
+
+(defun magik-company--ts-exemplar-node-in-buffer-for (exemplar-name)
+  "Exemplar node in buffer for EXEMPLAR-NAME."
+  (cdr (assoc 'exemplar-node (treesit-query-capture
+                              (treesit-buffer-root-node)
+                              (format
+                               "
+((invoke receiver: (variable) @var (symbol) @sym) @exemplar-node
+(#match %S @var) (#match %S @sym))"
+                               "^def_slotted_exemplar$"
+                               (concat "^:" exemplar-name "$"))))))
+
+(defun magik-company--ts-current-exemplar-node-with-locs ()
+  "Exemplar node with the locations."
+  (let* ((exemplar-node (magik-company--ts-exemplar-node-in-buffer-for
+                         (magik-company--ts-exemplar-of-enclosing-method)))
+         (start-loc (and exemplar-node (treesit-node-start exemplar-node)))
+         (end-loc (and exemplar-node (treesit-node-end exemplar-node))))
+    `((:node . ,exemplar-node)
+      (:start . ,start-loc)
+      (:end . ,end-loc))))
 
 (defun magik-company--ts-variables-in-scope ()
   "Return a list of all variable nodes within the enclosing fragment scope."
