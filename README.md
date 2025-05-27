@@ -41,6 +41,7 @@ When a method is completed the parameters are automatically inserted as yasnippe
 ### Variables
 all variables that are assigned with "<<" in your current scope are available for completion
 Parameters will also be seen as variables within a scope.
+Loop variables are also available within the loop scope as variable.
 
 ### Methods
 When a type is available all methods on this type are available
@@ -55,10 +56,9 @@ The type is available when:
 All loaded in exemplars will be available as objects.
 
 ### Slots
-Slots defined in the current file in the nearest exemplar (to be improved).
+Slots defined on the exemplar in this scope, slots have to be defined in the file.
 
 ## Limitations
 
 Currently this is bound to one session, when there are multiple sessions running there is no control over which session is being used.
 Magik is soft typed so quite often it is hard to determine the current exemplar to use for completion.
-Slots are only recognised in the nearest exemplar, and this is not checked whether it is the same exemplar
