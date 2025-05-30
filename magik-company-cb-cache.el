@@ -108,7 +108,7 @@ If RESET is true, the cache is regenerated."
     (when (or (not magik-company--conditions-source-cache-loaded) reset)
       (let ((prefix "<condition>."))
 	(setq magik-company--conditions-source-cache (magik-company--cb-method-candidates prefix))
-	;; adds an : infront so the prefix works with the results.
+	;; adds an : in front so the prefix works with the results.
 	(setq magik-company--conditions-source-cache
 	      (mapcar (lambda (item) (concat ":" item)) (magik-company--cb-method-candidates prefix)))
 	(setq magik-company--conditions-source-cache-loaded t)))))

@@ -67,7 +67,7 @@
   )
 
 (defun magik-company--in-comment ()
-  "Check if the current line start is with #, igore whitespaces."
+  "Check if the current line start is with #, ignore whitespaces."
   (save-excursion
     (beginning-of-line)
     (looking-at-p "^[ \t]*#")))
