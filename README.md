@@ -50,6 +50,7 @@ Loop variables are also available within the loop scope as variable.
 
 When a type is available all methods on this type are available
 The type is available when:
+
 - _self is used within a method and the exemplar is loaded in the session
 - an object from the objects candidates is used
 - a parameter with a type_doc comment is used
