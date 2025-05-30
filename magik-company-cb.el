@@ -197,7 +197,7 @@ Stores the buffer name in `magik-company--cb-gis-buffer-name`
 		   (if (eq (following-char) ? )
 		       (forward-char 1)))
 		  (t ;catch all error
-		   (message "Found unrecognised charcter at %d in %s" (point) (current-buffer))
+		   (message "Found unrecognised character at %d in %s" (point) (current-buffer))
 		   (goto-char (end-of-line))))))
 	(list args optional gather)))))
 
@@ -241,7 +241,7 @@ DOCUMENTATION ..."
 
     (cond ((zerop (length classify))
 	   ;; only check for iter
-	   ;; clasify also contains (iter)
+	   ;; classify also contains (iter)
 	   nil)
 	  ((string-match "iter" classify)
 	   (put-text-property 0 candidate-length 'iter t candidate))

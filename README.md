@@ -10,7 +10,7 @@
 ## Requirements
 
 This package requires:
-Magik mode with a version 0.4.1 or higher. (https://melpa.org/#/magik-mode)
+Magik mode with a version 0.4.1 or higher. [magik-mode](https://melpa.org/#/magik-mode)
 Emacs version 29.1 or higher.
 
 ## Installation
@@ -30,22 +30,27 @@ The alternative, and recommended, way of installing [magik-mode](https://github.
 ## Features
 
 ### Caching
+
 Caching is used to minimalize the usage of your local resources.
 Any time one transmits to magik (buffer or local) the cache is refreshed.
 magik-company-reload-cache can be used to manually refresh the cache.
 
 ### Yasnippet completion
+
 When a yasnippet is found it is automatically completed when the autocomplete is done.
-When a method is completed the parameters are automatically inserted as yasnippet (optional can be toggeled)
+When a method is completed the parameters are automatically inserted as yasnippet (optional can be toggled)
 
 ### Variables
+
 all variables that are assigned with "<<" in your current scope are available for completion
 Parameters will also be seen as variables within a scope.
 Loop variables are also available within the loop scope as variable.
 
 ### Methods
+
 When a type is available all methods on this type are available
 The type is available when:
+
 - _self is used within a method and the exemplar is loaded in the session
 - an object from the objects candidates is used
 - a parameter with a type_doc comment is used
@@ -53,9 +58,11 @@ The type is available when:
 - a variable assigned with a new* method
 
 ### Objects
+
 All loaded in exemplars will be available as objects.
 
 ### Slots
+
 Slots defined on the exemplar in this scope, slots have to be defined in the file.
 
 ## Limitations
