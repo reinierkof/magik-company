@@ -28,14 +28,14 @@
 (defvar magik-company--ts-scope-keywords '("method" "block" "procedure"))
 
 
-(defun magik-company--ts-assignments-in-scope (node)
-  "Assignments in a NODE."
+(defun magik-company--ts-node-type-in-scope (node type)
+  "TYPE in a NODE."
   (let ((results '()))
     (when node
       (let ((stack (treesit-node-children node)))
 	(while stack
 	  (let ((current (pop stack)))
-	    (when (string= (treesit-node-type current) "assignment")
+	    (when (string= (treesit-node-type current) type)
 	      (push current results))
 	    (when (not (member (treesit-node-type current)
 			       magik-company--ts-scope-keywords))
@@ -51,6 +51,25 @@
 			     magik-company--ts-scope-keywords)))
       (setq node (treesit-node-parent node)))
     node))
+
+(defun magik-company--ts-enclosing-method ()
+  "Return the enclosing node of type method."
+  (let ((node (treesit-node-at (point))))
+    (while (and node
+		(not (string= (treesit-node-type node) "method")))
+      (setq node (treesit-node-parent node)))
+    node))
+
+(defun magik-company--ts-exemplar-of-enclosing-method ()
+  "Return the exemplar name of the enclosing method."
+  (let ((node (magik-company--ts-enclosing-method)))
+    (when node
+      (let ((results-node
+	     (cdr (assoc 'exemplar
+			 (treesit-query-capture node "(method exemplarname: (identifier) @exemplar)")))))
+	(when results-node
+	  (substring-no-properties (treesit-node-text results-node))
+	  )))))
 
 (defun magik-company--ts-lhs-variables-in-assignment-node(node variables)
   "Lhs variables of an assignment NODE added in VARIABLES list."
@@ -89,6 +108,41 @@
 	    (setq stack (append (treesit-node-children current) stack)))))))
   variables)
 
+(defun magik-company--ts-for-loop-variables-in-scope(node variables)
+  "VARIABLES gained in the for loop statement in a NODE."
+  (when (and (< (treesit-node-start node) (point))
+	     (> (treesit-node-end  node) (point)))
+    (let ((children (treesit-node-children node))
+	  (found nil))
+      (dolist (child children)
+	(when (string= (treesit-node-text child) "over")
+	  (setq found t))
+	(when (and (not found)
+		   (string= (treesit-node-type child) "identifier"))
+	  (push (substring-no-properties (treesit-node-text child)) variables)))))
+  variables)
+
+(defun magik-company--ts-exemplar-node-in-buffer-for (exemplar-name)
+  "Exemplar node in buffer for EXEMPLAR-NAME."
+  (cdr (assoc 'exemplar-node (treesit-query-capture
+                              (treesit-buffer-root-node)
+                              (format
+                               "
+((invoke receiver: (variable) @var (symbol) @sym) @exemplar-node
+(#match %S @var) (#match %S @sym))"
+                               "^def_slotted_exemplar$"
+                               (concat "^:" exemplar-name "$"))))))
+
+(defun magik-company--ts-current-exemplar-node-with-locs ()
+  "Exemplar node with the locations."
+  (let* ((exemplar-node (magik-company--ts-exemplar-node-in-buffer-for
+                         (magik-company--ts-exemplar-of-enclosing-method)))
+         (start-loc (and exemplar-node (treesit-node-start exemplar-node)))
+         (end-loc (and exemplar-node (treesit-node-end exemplar-node))))
+    `((:node . ,exemplar-node)
+      (:start . ,start-loc)
+      (:end . ,end-loc))))
+
 (defun magik-company--ts-variables-in-scope ()
   "Return a list of all variable nodes within the enclosing fragment scope."
   (interactive)
@@ -96,8 +150,11 @@
 	(scope (magik-company--ts-enclosing-scope)))
     (when scope
       (setq variables (magik-company--ts-import-variables-in-scope scope variables))
-      (dolist (a-node (magik-company--ts-assignments-in-scope scope))
+      (dolist (a-node (magik-company--ts-node-type-in-scope scope "assignment"))
 	(setq variables (magik-company--ts-lhs-variables-in-assignment-node a-node variables))
+	)
+      (dolist (a-node (magik-company--ts-node-type-in-scope scope "iterator"))
+	(setq variables (magik-company--ts-for-loop-variables-in-scope a-node variables))
 	))
     (delete-dups variables)))
 
