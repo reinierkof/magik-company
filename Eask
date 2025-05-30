@@ -1,6 +1,6 @@
 (package "magik-company"
          "0.1.0"
-         "Emacs company backend for magik language")
+         "Magik backend for company-mode")
 
 (website-url "https://github.com/reinierkof/magik-company")
 (keywords "company-backends")
@@ -17,4 +17,3 @@
 (depends-on "magik-mode")
 (depends-on "company")
 (depends-on "yasnippet")
-(depends-on "treesit")

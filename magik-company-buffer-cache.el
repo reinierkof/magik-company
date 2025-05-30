@@ -100,19 +100,11 @@
 (defun magik-company--exemplar-slots ()
   "Retrieve the slots from a exemplar or mixin."
   (let ((slots '())
-	slotted-loc dollar-loc)
-    (save-excursion
-      (setq slotted-loc (or (when (re-search-backward "\\(def_slotted_exemplar\\)" nil t)
-			      (match-beginning 0))
-			    (when (re-search-backward "\\(def_mixin\\)" nil t)
-			      (match-beginning 0))
-			    (when (re-search-backward "\\(def_indexed_exemplar\\)" nil t)
-			      (match-beginning 0))))
-      (when slotted-loc
-	(goto-char slotted-loc)
-	(setq dollar-loc (when (re-search-forward "\\(\\$\\)" nil t)
-			   (match-beginning 0)))
-	(when dollar-loc
+        (exemplar-data (magik-company--ts-current-exemplar-node-with-locs)))
+    (when (alist-get :node exemplar-data)
+      (let ((slotted-loc (alist-get :start exemplar-data))
+            (dollar-loc (alist-get :end exemplar-data)))
+        (save-excursion
 	  (goto-char slotted-loc)
 	  (while (re-search-forward "{\\s-*:\\(\\sw+\\)\\s-*,\\s-*\\(_unset\\)\\s-*" dollar-loc t)
 	    (push (match-string 1) slots))

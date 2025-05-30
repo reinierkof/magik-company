@@ -3,7 +3,7 @@
 ;; Package-Version: 0.1.0
 ;; Package-Requires: ((emacs "29.1") (magik-mode "0.4.1") (company) (yasnippet))
 ;; URL: "https://github.com/reinierkof/magik-company"
-;; Keywords "company-backends")
+;; Keywords: "company-backends"
 
 ;; Copyright (C) 2024 Reinier Koffijberg
 
@@ -109,7 +109,7 @@ COMMAND, ARG, IGNORED"
       )
 
     ;; should not contain duplicates, because the filter takes it out.
-    ;; incase we need it we can use this one.
+    ;; in case we need it we can use this one.
     ;; (setq magik-candidates (delete-dups magik-candidates))
     magik-candidates))
 
