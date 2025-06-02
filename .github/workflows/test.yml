@@ -34,13 +34,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         emacs-version:
           - 29.1
-          - 29.2
-          - 29.3
           - 29.4
           - 30.1
         experimental: [false]
