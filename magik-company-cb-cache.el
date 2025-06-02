@@ -65,10 +65,11 @@
 (defun magik-company--method-candidates (prefix)
   "List of methods on a class.
 Uses a cache variable `magik-company--class-method-source-cache'.
-All the methods beginning with the first character are returned and stored in the cache.
-Thus subsequent characters refining the match are handled by auto-complete refining
+All the methods beginning with the first character,
+ are returned and stored in the cache.
+Thus subsequent characters refining the match are handled by auto-complete.
 the list of all possible matches, without recourse to the class browser.
-PREFIX ..."
+PREFIX the current prefix"
   (let ((exemplar (magik-company--exemplar-near-point))
 	(short-prefix prefix))
     (if exemplar
@@ -84,7 +85,7 @@ PREFIX ..."
     ))
 
 (defun magik-company--objects-source-init (&optional reset)
-  "Initialisation function for obtaining all Magik Objects for use in auto-complete-mode.
+  "Initialisation function for obtaining all Magik Objects for use in company-mode.
 If RESET is true, the cache is regenerated."
   (when (magik-company--cb-start-process)
     (when (or (not magik-company--objects-source-cache-loaded) reset)
@@ -93,7 +94,7 @@ If RESET is true, the cache is regenerated."
 	(setq magik-company--objects-source-cache-loaded t)))))
 
 (defun magik-company--globals-source-init (&optional reset)
-  "Initialisation function for obtaining all Magik Conditions for use in auto-complete-mode.
+  "Initialisation function for obtaining all Magik Globals for use in company-mode.
 If RESET is true, the cache is regenerated."
   (when (magik-company--cb-start-process)
     (when (or (not magik-company--globals-source-cache-loaded) reset)
@@ -102,7 +103,8 @@ If RESET is true, the cache is regenerated."
 	(setq magik-company--globals-source-cache-loaded t)))))
 
 (defun magik-company--conditions-source-init (&optional reset)
-  "Initialisation function for obtaining all Magik Conditions for use in auto-complete-mode.
+  "Initialisation function for obtaining all Magik Conditions.
+Magik conditions are for use in company-mode.
 If RESET is true, the cache is regenerated."
   (when (magik-company--cb-start-process)
     (when (or (not magik-company--conditions-source-cache-loaded) reset)
