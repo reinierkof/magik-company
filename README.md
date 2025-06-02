@@ -18,13 +18,13 @@ Emacs version 29.1 or higher.
 This package is available on [MELPA](https://melpa.org/).
 See [Emacs Wiki](https://www.emacswiki.org/emacs/InstallingPackages) for instructions on how to set up and install packages.
 
-The alternative, and recommended, way of installing [magik-mode](https://github.com/roadrunner1776/magik) is using [use-package](https://github.com/jwiegley/use-package):
+The alternative, and recommended, way of installing this backend is using [use-package](https://github.com/jwiegley/use-package):
 
 ```emacs-lisp
 (use-package magik-company
   :after company
   :config
-  (add-to-list 'company-backends 'company-magik))
+  (add-to-list 'company-backends 'magik-company))
 ```
 
 ## Features

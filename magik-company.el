@@ -46,13 +46,13 @@
 (defvar magik-company--slots-candidates nil)
 (defvar magik-company--exemplar-candidate nil)
 
-(defgroup company-magik nil
+(defgroup magik-company nil
   "Company back-end for Magik code completion."
   :group 'company
   :group 'magik)
 
 ;;;###autoload
-(defun company-magik (command &optional arg &rest ignored)
+(defun magik-company (command &optional arg &rest ignored)
   "Company backend for magik-mode.
 COMMAND, ARG, IGNORED"
   (interactive (list 'interactive))
