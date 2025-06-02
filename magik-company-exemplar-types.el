@@ -35,8 +35,7 @@
 Each entry is a double: (TYPE REGEX).")
 
 (defvar magik-company--class-assignment-patterns
-  '("\\s-*<<[ \t\n]*\\(\\S-+\\)\\.new")
-  )
+  '("\\s-*<<[ \t\n]*\\(\\S-+\\)\\.new"))
 
 (defun magik-company--try-method-exemplar-type (variable)
   "Retrieve the exemplar type based on what VARIABLE is."

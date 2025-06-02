@@ -64,7 +64,7 @@ Returns t if the process was started or running, nil if there's an error."
 	(setq smallworld-gis (buffer-local-value 'magik-smallworld-gis (get-buffer gis-buffer-name)))
 	(setq magik-company--cb-process
 	      (magik-cb-get-process-create
-	       magik-session-cb-ac-buffer 'magik-company--cb-filter smallworld-gis gis-buffer-name nil))
+	       magik-company--cb-buffer 'magik-company--cb-filter smallworld-gis gis-buffer-name nil))
 	)
       (if (process-live-p magik-company--cb-process)
 	  (progn

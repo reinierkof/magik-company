@@ -37,8 +37,6 @@
 (require 'magik-company-exemplar-types)
 (require 'magik-company-yasnippet-handling)
 
-
-
 (defvar magik-company--objects-candidates nil)
 (defvar magik-company--globals-candidates nil)
 (defvar magik-company--conditions-candidates nil)
@@ -63,9 +61,7 @@ COMMAND, ARG, IGNORED"
     (candidates (magik-company--candidates))
     (annotation (magik-company--annotation arg))
     (kind (magik-company--kind arg))
-    (post-completion (magik-company--post-completion arg))
-    )
-  )
+    (post-completion (magik-company--post-completion arg))))
 
 (defun magik-company--candidates ()
   "Generate a list of completion candidates."
@@ -105,8 +101,7 @@ COMMAND, ARG, IGNORED"
       (setq magik-candidates (append magik-candidates magik-company--conditions-candidates)))
 
     (dolist (candidate magik-candidates)
-      (magik-company--add-yasnippet-text-property candidate)
-      )
+      (magik-company--add-yasnippet-text-property candidate))
 
     ;; should not contain duplicates, because the filter takes it out.
     ;; in case we need it we can use this one.
@@ -128,16 +123,13 @@ and are not already present in EXISTING-CANDIDATES."
   "Insert parameters in snippet for CANDIDATE."
   (if (get-text-property 0 'yasnippet candidate)
       (magik-company--insert-candidate-yasnippet candidate)
-    (magik-company--insert-candidate-args-yasnippet candidate))
-  )
-
+    (magik-company--insert-candidate-args-yasnippet candidate)))
 
 (defun magik-company--kind (candidate)
   "retrieve the kind."
   (if (get-text-property 0 'yasnippet candidate)
       'snippet
-    (get-text-property 0 'kind candidate))
-  )
+    (get-text-property 0 'kind candidate)))
 
 (provide 'magik-company)
 ;;; magik-company.el ends here

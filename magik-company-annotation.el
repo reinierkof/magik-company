@@ -45,9 +45,7 @@
 			      (when args
 				(concat "<" (mapconcat #'identity args ", ") ">")))))))
     (when (get-text-property 0 'iter candidate) (setq result (concat "(I) " result)))
-    result
-    ))
-
+    result))
 
 (defun magik-company--annotation-required-params (candidate)
   "Retrieve the arguments text property from CANDIDATE.
@@ -75,7 +73,6 @@ Making the arguments italic."
 	(mapcar (lambda (a-param)
 		  (propertize (format "%s" a-param) 'face '(:slant italic)))
 		params)))))
-
 
 (provide 'magik-company-annotation)
 ;;; magik-company-annotation.el ends here

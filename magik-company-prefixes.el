@@ -59,12 +59,9 @@
     (save-excursion
       (if (re-search-backward regex start t)
 	  (setq result (buffer-substring-no-properties (+ 1 (point)) end))
-	(setq result (buffer-substring-no-properties start end)))
-      )
+	(setq result (buffer-substring-no-properties start end))))
     (setq magik-company-cur-prefix (downcase result))
-    magik-company-cur-prefix
-    )
-  )
+    magik-company-cur-prefix))
 
 (defun magik-company--in-comment ()
   "Check if the current line start is with #, ignore whitespaces."

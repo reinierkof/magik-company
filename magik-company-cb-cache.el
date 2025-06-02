@@ -46,9 +46,7 @@
 	magik-company--objects-source-cache nil
 	magik-company--globals-source-cache nil
 	magik-company--conditions-source-cache nil
-	magik-company--class-method-source-cache nil
-	)
-  )
+	magik-company--class-method-source-cache nil))
 
 (defun magik-company--load-source-caches ()
   "Check if the source caches are loaded and do init if needed."
@@ -59,8 +57,7 @@
     (magik-company--globals-source-init))
 
   (when (not magik-company--conditions-source-cache-loaded)
-    (magik-company--conditions-source-init))
-  )
+    (magik-company--conditions-source-init)))
 
 (defun magik-company--method-candidates (prefix)
   "List of methods on a class.
@@ -81,8 +78,7 @@ PREFIX the current prefix"
 		(when (magik-company--cb-start-process)
 		  (setq magik-company--class-method-source-cache (magik-company--cb-method-candidates short-prefix))))))
       (setq magik-company--class-method-source-cache nil))
-    magik-company--class-method-source-cache
-    ))
+    magik-company--class-method-source-cache))
 
 (defun magik-company--objects-source-init (&optional reset)
   "Initialisation function for obtaining all Magik Objects for use in company-mode.
