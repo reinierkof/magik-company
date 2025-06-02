@@ -1,4 +1,4 @@
-;;; magik-company-cb.el --- ;;; magik-company-cb.el --- Magik Classbrowser company Support
+;;; magik-company-cb.el --- ;;; magik-company-cb.el --- Magik Classbrowser company Support -*- lexical-binding: t; -*-
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
