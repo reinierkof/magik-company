@@ -1,9 +1,9 @@
 ;;; magik-company.el --- Magik backend for company-mode -*- lexical-binding: t; -*-
 
 ;; Package-Version: 0.1.0
-;; Package-Requires: ((emacs "29.1") (magik-mode "0.4.1") (company) (yasnippet))
-;; URL: "https://github.com/reinierkof/magik-company"
-;; Keywords: "company-backends"
+;; Package-Requires: ((emacs "29.1") (magik-mode "0.4.1") (company "1.0.2") (yasnippet "0.14.0"))
+;; URL: https://github.com/reinierkof/magik-company
+;; Keywords:
 
 ;; Copyright (C) 2024 Reinier Koffijberg
 
@@ -24,7 +24,7 @@
 
 ;;; Commentary:
 
-;; See the README for more details.
+;; This is a project for better auto-completion in Magik.
 
 ;;; Code:
 
@@ -53,7 +53,7 @@
 
 ;;;###autoload
 (defun magik-company (command &optional arg &rest ignored)
-  "Company backend for magik-mode.
+  "Company backend for `magik-mode'.
 COMMAND, ARG, IGNORED"
   (interactive (list 'interactive))
   (cl-case command
@@ -109,7 +109,8 @@ COMMAND, ARG, IGNORED"
     magik-candidates))
 
 (defun magik-company--filter-candidates (new-candidates existing-candidates)
-  "Filter NEW-CANDIDATES to include only those that start with magik current prefix
+  "Filter NEW-CANDIDATES.
+Include only candidates starting with current prefix.
 and are not already present in EXISTING-CANDIDATES."
   (if (listp new-candidates)
       (progn
@@ -126,7 +127,7 @@ and are not already present in EXISTING-CANDIDATES."
     (magik-company--insert-candidate-args-yasnippet candidate)))
 
 (defun magik-company--kind (candidate)
-  "retrieve the kind."
+  "Retrieve the kind for CANDIDATE."
   (if (get-text-property 0 'yasnippet candidate)
       'snippet
     (get-text-property 0 'kind candidate)))
