@@ -1,9 +1,9 @@
-;;; magik-company.el --- Magik backend for company-mode
+;;; magik-company.el --- Magik backend for company-mode -*- lexical-binding: t; -*-
 
 ;; Package-Version: 0.1.0
-;; Package-Requires: ((emacs "29.1") (magik-mode "0.4.1") (company) (yasnippet))
-;; URL: "https://github.com/reinierkof/magik-company"
-;; Keywords: "company-backends"
+;; Package-Requires: ((emacs "29.1") (magik-mode "0.4.1") (company "1.0.2") (yasnippet "0.14.0"))
+;; URL: https://github.com/reinierkof/magik-company
+;; Keywords:
 
 ;; Copyright (C) 2024 Reinier Koffijberg
 
@@ -24,7 +24,7 @@
 
 ;;; Commentary:
 
-;; See the README for more details.
+;; This is a project for better auto-completion in Magik.
 
 ;;; Code:
 
@@ -37,8 +37,6 @@
 (require 'magik-company-exemplar-types)
 (require 'magik-company-yasnippet-handling)
 
-
-
 (defvar magik-company--objects-candidates nil)
 (defvar magik-company--globals-candidates nil)
 (defvar magik-company--conditions-candidates nil)
@@ -48,14 +46,14 @@
 (defvar magik-company--slots-candidates nil)
 (defvar magik-company--exemplar-candidate nil)
 
-(defgroup company-magik nil
+(defgroup magik-company nil
   "Company back-end for Magik code completion."
   :group 'company
   :group 'magik)
 
 ;;;###autoload
-(defun company-magik (command &optional arg &rest ignored)
-  "Company backend for magik-mode.
+(defun magik-company (command &optional arg &rest _ignored)
+  "Company backend for `magik-mode'.
 COMMAND, ARG, IGNORED"
   (interactive (list 'interactive))
   (cl-case command
@@ -63,9 +61,7 @@ COMMAND, ARG, IGNORED"
     (candidates (magik-company--candidates))
     (annotation (magik-company--annotation arg))
     (kind (magik-company--kind arg))
-    (post-completion (magik-company--post-completion arg))
-    )
-  )
+    (post-completion (magik-company--post-completion arg))))
 
 (defun magik-company--candidates ()
   "Generate a list of completion candidates."
@@ -105,8 +101,7 @@ COMMAND, ARG, IGNORED"
       (setq magik-candidates (append magik-candidates magik-company--conditions-candidates)))
 
     (dolist (candidate magik-candidates)
-      (magik-company--add-yasnippet-text-property candidate)
-      )
+      (magik-company--add-yasnippet-text-property candidate))
 
     ;; should not contain duplicates, because the filter takes it out.
     ;; in case we need it we can use this one.
@@ -114,7 +109,8 @@ COMMAND, ARG, IGNORED"
     magik-candidates))
 
 (defun magik-company--filter-candidates (new-candidates existing-candidates)
-  "Filter NEW-CANDIDATES to include only those that start with magik current prefix
+  "Filter NEW-CANDIDATES.
+Include only candidates starting with current prefix.
 and are not already present in EXISTING-CANDIDATES."
   (if (listp new-candidates)
       (progn
@@ -128,16 +124,13 @@ and are not already present in EXISTING-CANDIDATES."
   "Insert parameters in snippet for CANDIDATE."
   (if (get-text-property 0 'yasnippet candidate)
       (magik-company--insert-candidate-yasnippet candidate)
-    (magik-company--insert-candidate-args-yasnippet candidate))
-  )
-
+    (magik-company--insert-candidate-args-yasnippet candidate)))
 
 (defun magik-company--kind (candidate)
-  "retrieve the kind."
+  "Retrieve the kind for CANDIDATE."
   (if (get-text-property 0 'yasnippet candidate)
       'snippet
-    (get-text-property 0 'kind candidate))
-  )
+    (get-text-property 0 'kind candidate)))
 
 (provide 'magik-company)
 ;;; magik-company.el ends here

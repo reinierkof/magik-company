@@ -32,22 +32,19 @@
   "If there is a snippet for CANDIDATE add a text property."
   (when (and (not (get-text-property 0 'yasnippet candidate))
 	     (magik-company--candidate-is-yasnippet candidate))
-    (put-text-property 0 (length candidate) 'yasnippet t candidate)
-    ))
+    (put-text-property 0 (length candidate) 'yasnippet t candidate)))
 
 (defun magik-company--insert-param-yasnippet (list)
   "Insert a param yasnippet from LIST, each param is a tab and ends after the ')'."
-  (when (not (null list))
+  (when list
     (if (eq (char-before) ?\))
 	(progn
 	  (delete-char -1)
 	  (yas-expand-snippet
-	   (concat (mapconcat (lambda (param) (format "${%s}" param)) list ", ") ")$0")
-	   ))
+	   (concat (mapconcat (lambda (param) (format "${%s}" param)) list ", ") ")$0")))
       (progn
 	(yas-expand-snippet
-	 (concat (concat "(" (mapconcat (lambda (param) (format "${%s}" param)) list ", ") ")$0"))
-	 )))))
+	 (concat (concat "(" (mapconcat (lambda (param) (format "${%s}" param)) list ", ") ")$0")))))))
 
 (defun magik-company--candidate-is-yasnippet (key)
   "Get the snippet called KEY in MODE's tables."
@@ -56,15 +53,13 @@
 	(yas-choose-keys-first nil))
     (cl-find key (yas--all-templates
 		  (yas--get-snippet-tables major-mode))
-	     :key #'yas--template-key :test #'string=))
-  )
+	     :key #'yas--template-key :test #'string=)))
 
 (defun magik-company--insert-candidate-yasnippet(candidate)
   "Insert the yasnippet from CANDIDATE as post completion."
   (let ((a-snippet (magik-company--candidate-is-yasnippet candidate)))
     (delete-region (- (point) (length candidate)) (point))
-    (yas-expand-snippet a-snippet))
-  )
+    (yas-expand-snippet a-snippet)))
 
 (defun magik-company--insert-candidate-args-yasnippet(candidate)
   "Check which type of arguments a CANDIDATE has.
@@ -79,15 +74,14 @@ Insert them depending on settings."
 					   (get-text-property 0 'optional candidate))))
 	(when (and magik-company-insert-gather-param (get-text-property 0 'gather candidate))
 	  (setq arguments-to-insert (nconc arguments-to-insert (list "gather"))))
-	(magik-company--insert-param-yasnippet arguments-to-insert)
-	))))
+	(magik-company--insert-param-yasnippet arguments-to-insert)))))
 
 (defun magik-company--candidate-is-method(candidate)
+  "Check if CANDIDATE is a magik method."
   (let ((a-kind (get-text-property 0 'kind candidate)))
     (or (eq a-kind 'method)
 	(eq a-kind 'assign-method)
-	(eq a-kind 'global)
-	)))
+	(eq a-kind 'global))))
 
 (provide 'magik-company-yasnippet-handling)
 ;;; magik-company-yasnippet-handling.el ends here

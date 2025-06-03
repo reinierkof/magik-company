@@ -34,14 +34,13 @@
 (defvar magik-company--last-line-number 0)
 
 (defun magik-company--update-buffer-caches ()
-  "docs."
+  "Update all local buffer caches."
   (when (/= magik-company--last-line-number (line-number-at-pos))
     (setq magik-company--last-line-number (line-number-at-pos))
     (magik-company--load-params-cache)
     (magik-company--load-variables-cache)
     (magik-company--load-slots-cache)
-    (magik-company--load-classname-cache)
-    ))
+    (magik-company--load-classname-cache)))
 
 (defun magik-company--load-params-cache ()
   "Load method parameters into the cache and add the parameter kind property."
@@ -67,14 +66,12 @@
 	(mapcar (lambda (el) (propertize el 'kind 'exemplar))
 		(list (magik-yasnippet-prev-class-name)))))
 
-
 (defun magik-company--local-variables ()
   "Gather local variables in the current scope."
-  (magik-company--ts-variables-in-scope)
-  )
+  (magik-company--ts-variables-in-scope))
 
 (defun magik-company--method-parameters ()
-  ""
+  "Get local buffer parameters from nearest function."
   (let ((method-regex (cdr (assoc "method-with-arguments" magik-regexp)))
 	(assignment-regex (cdr (assoc "assignment-method" magik-regexp)))
 	params method-loc)
@@ -86,8 +83,7 @@
 	(setq params (or (when (search-backward-regexp method-regex (- method-loc 20) t)
 			   (match-string 1))
 			 (when (search-backward-regexp assignment-regex (- method-loc 20) t)
-			   (match-string 1)
-			   )))))
+			   (match-string 1))))))
     (when params
       (setq params (mapcar #'string-trim (split-string params "," t)))
       (setq params (cl-remove-if (lambda (param)
@@ -107,8 +103,7 @@
         (save-excursion
 	  (goto-char slotted-loc)
 	  (while (re-search-forward "{\\s-*:\\(\\sw+\\)\\s-*,\\s-*\\(_unset\\)\\s-*" dollar-loc t)
-	    (push (match-string 1) slots))
-	  )))
+	    (push (match-string 1) slots)))))
     slots))
 
 (provide 'magik-company-buffer-cache)

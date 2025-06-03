@@ -25,11 +25,9 @@
 ;;; Code:
 (require 'company)
 
-(with-eval-after-load 'magik-mode
-  (add-hook 'magik-session-start-process-post-hook 'magik-company--kill-cb-ac-buffer))
+(add-hook 'magik-session-start-process-post-hook #'magik-company--kill-cb-ac-buffer)
 
-
-(defconst magik-session-cb-ac-buffer "*cb-company*"
+(defconst magik-company--cb-buffer "*cb-company*"
   "The autocomplete class browser buffer associated with the GIS process.")
 
 (defvar magik-company--cb-process nil
@@ -37,14 +35,14 @@
 
 (defun magik-company--kill-cb-ac-buffer ()
   "Try to kill the magik-company buffer when starting a session."
-  (when (get-buffer magik-session-cb-ac-buffer)
-    (let ((magik-local-cb-ac-process (get-buffer-process (get-buffer magik-session-cb-ac-buffer))))
+  (when (get-buffer magik-company--cb-buffer)
+    (let ((magik-local-cb-ac-process (get-buffer-process (get-buffer magik-company--cb-buffer))))
       (when magik-local-cb-ac-process
 	(delete-process magik-local-cb-ac-process)
 	(setq magik-company--cb-process nil)))))
 
 (defun magik-company--add-icon-to-alist (kind icon)
-  "Append a KIND to `company-vscode-icons-mapping` if it doesn't already exist."
+  "Append a KIND to ICON in `company-vscode-icons-mapping' if its new."
   (unless (assoc kind company-vscode-icons-mapping)
     (setq company-vscode-icons-mapping
 	  (append company-vscode-icons-mapping
@@ -59,8 +57,6 @@
 		 (parameter  . "symbol-parameter.svg")
 		 (global  . "symbol-misc.svg")))
   (magik-company--add-icon-to-alist (car entry) (cdr entry)))
-
-
 
 (provide 'magik-company-extras)
 ;;; magik-company-extras.el ends here
