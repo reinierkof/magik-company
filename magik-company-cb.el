@@ -87,7 +87,7 @@ killing any associated processes without prompting."
       (when (and name
 		 (string-prefix-p "*cb" name)
 		 (string-suffix-p "company*" name))
-	(when-let ((proc (get-buffer-process buf)))
+	(when-let* ((proc (get-buffer-process buf)))
 	  (delete-process proc))
 	(kill-buffer buf)))))
 
@@ -131,9 +131,7 @@ Stores the buffer name in `magik-company--cb-gis-buffer-name`
 (defun magik-company--cb-candidate-methods ()
   "Return candidate methods matching `ac-prefix' from Method finder output."
   ;;TODO combine method definition with its signature.
-  ;;TODO use class & method.
   (let ((method (car nil))
-	(class (cdr nil))
 	(ac-limit magik-company--cb-max-methods))
     (setq method
 	  (if (zerop (length method))
@@ -231,7 +229,6 @@ DOCUMENTATION ..."
 	 (gather (elt args 2))
 	 (candidate-length (length candidate))
 	 (method-signature (magik-method-name-type candidate))
-	 (method (car method-signature))
 	 (signature (cdr method-signature))
 	 (signature-p (> (length signature) 0))
 	 assignment)

@@ -85,7 +85,7 @@ Each entry is a double: (TYPE REGEX).")
 
 (defun magik-company--check-typed-params (variable)
   "Return the method parameter type for VARIABLE."
-  (when-let ((method-param-type (magik-company--method-param-type variable)))
+  (when-let* ((method-param-type (magik-company--method-param-type variable)))
     method-param-type))
 
 (defun magik-company--method-param-type (param-name)
@@ -174,7 +174,7 @@ If matched, return TYPE, otherwise nil."
 ;; 		     when match return match))
 
 ;; 	   ;; Check typed params (use the stored result)
-;; 	    ((when-let ((method-param-type (magik-company--method-param-type variable)))
+;; 	    ((when-let* ((method-param-type (magik-company--method-param-type variable)))
 ;; 	      method-param-type))
 
 ;; 	    ;; default case
