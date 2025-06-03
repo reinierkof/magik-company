@@ -58,7 +58,7 @@ Each entry is a double: (TYPE REGEX).")
 	(file-name-sans-extension (buffer-name)))))
 
 (defun magik-company--super-case (variable)
-  "Return the super exemplar type if variable is '_super'."
+  "Return the super exemplar type if VARIABLE is `_super'."
   (when (string-match "_super(\\([a-zA-Z_]+\\))" variable)
     (match-string 1 variable)))
 
@@ -108,7 +108,7 @@ PARAM-NAME ..."
 
 (defun magik-company--check-assignment-and-type (variable regex type)
   "Check if VARIABLE matches a REGEX pattern in the buffer.
-If matched, return TYPE-OR-CLASS, otherwise nil."
+If matched, return TYPE, otherwise nil."
   (save-excursion
     (if (re-search-backward (concat (regexp-quote variable) regex) nil t)
 	(progn

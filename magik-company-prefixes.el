@@ -87,7 +87,7 @@
       nil)))
 
 (defun magik-company--at-slot-prefix ()
-  "Detect if the point is at .vari"
+  "Detect if the point is at .variable ."
   (save-excursion
     (if (re-search-backward "\\(?:^\\|[^[:word:].]\\)\\.\\w*\\="
 			    (line-beginning-position) t)

@@ -39,6 +39,8 @@
 
 (advice-add #'magik-transmit-region :after #'magik-company-reload-cache)
 
+(declare-function magik-company--exemplar-near-point "magik-company")
+
 (defun magik-company-reload-cache (&rest _args)
   "Reset the caches such that they will refill upon triggering the prefix."
   (interactive)
