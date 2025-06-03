@@ -1,4 +1,4 @@
-;;; magik-company-cb.el --- ;;; magik-company-cb.el --- Magik Classbrowser company Support
+;;; magik-company-cb.el --- ;;; magik-company-cb.el --- Magik Classbrowser company Support -*- lexical-binding: t; -*-
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -25,6 +25,14 @@
 
 (defvar magik-company--cb-max-methods 1000)
 (defvar magik-company--session-running nil)
+
+(declare-function magik-company-reload-cache "magik-company")
+
+(advice-add #'magik-session-kill-process :after
+	    (lambda (&rest _args)
+	      (setq magik-company--session-running nil)
+              (magik-company-reload-cache)
+	      (magik-company--force-kill-cb-company-buffers)))
 
 (defun magik-company--cb-filter (p s)
   "Process data coming back from the CB auto-complete buffer.
@@ -64,8 +72,7 @@ Returns t if the process was started or running, nil if there's an error."
 	(setq smallworld-gis (buffer-local-value 'magik-smallworld-gis (get-buffer gis-buffer-name)))
 	(setq magik-company--cb-process
 	      (magik-cb-get-process-create
-	       magik-session-cb-ac-buffer 'magik-company--cb-filter smallworld-gis gis-buffer-name nil))
-	)
+	       magik-company--cb-buffer 'magik-company--cb-filter smallworld-gis gis-buffer-name nil)))
       (if (process-live-p magik-company--cb-process)
 	  (progn
 	    (magik-company-reload-cache)
@@ -80,21 +87,13 @@ killing any associated processes without prompting."
       (when (and name
 		 (string-prefix-p "*cb" name)
 		 (string-suffix-p "company*" name))
-	(when-let ((proc (get-buffer-process buf)))
+	(when-let* ((proc (get-buffer-process buf)))
 	  (delete-process proc))
 	(kill-buffer buf)))))
 
-(with-eval-after-load 'magik-mode
-  (advice-add 'magik-transmit-region :after #'magik-company-reload-cache)
-  (advice-add 'magik-session-kill-process :after (lambda (&rest args)
-						   (setq magik-company--session-running nil)
-						   (magik-company-reload-cache)
-						   (magik-company--force-kill-cb-company-buffers))
-	      ))
-
 (defun magik-company--magik-process-started?(gis-buffer-name)
-  "Poke to the magik-process to see if it has started.
- This is not a great solution because it might spam the terminal.
+  "Poke to the magik-process in GIS-BUFFER-NAME to see if it has started.
+This is not a great solution because it might spam the terminal.
 For now it's the only way to know whether,
  the process has loaded the method-finder etc."
   (interactive)
@@ -114,10 +113,8 @@ For now it's the only way to know whether,
 			   (> method-finder-pos magik-end-process-pos)))
 		  (progn (setq magik-company--session-running t)
 			 t)
-		nil
-		))))
-      nil)
-    ))
+		nil))))
+      nil)))
 
 (defun magik-company--cb-get-gis-buffer ()
   "Find the gis buffer in current buffers if it is active.
@@ -135,7 +132,6 @@ Stores the buffer name in `magik-company--cb-gis-buffer-name`
   "Return candidate methods matching `ac-prefix' from Method finder output."
   ;;TODO combine method definition with its signature.
   (let ((method (car nil))
-	(class (cdr nil))
 	(ac-limit magik-company--cb-max-methods))
     (setq method
 	  (if (zerop (length method))
@@ -159,7 +155,6 @@ Stores the buffer name in `magik-company--cb-gis-buffer-name`
 		args      (magik-company--cb-method-args (match-beginning 4))
 		documentation (match-string-no-properties 5))
 	  (magik-company--cb-add-method-properties candidate class args classify documentation)
-
 	  (if (member candidate candidates)
 	      nil ; already present
 	    (setq candidates (append (list candidate) candidates)
@@ -234,7 +229,6 @@ DOCUMENTATION ..."
 	 (gather (elt args 2))
 	 (candidate-length (length candidate))
 	 (method-signature (magik-method-name-type candidate))
-	 (method (car method-signature))
 	 (signature (cdr method-signature))
 	 (signature-p (> (length signature) 0))
 	 assignment)
@@ -292,12 +286,10 @@ DOCUMENTATION ..."
      ((equal (substring signature 0 1) "(")
       (put-text-property 0 candidate-length 'kind 'method candidate)
       (put-text-property 0 candidate-length 'start-signature "(" candidate)
-      (put-text-property 0 candidate-length 'end-signature (substring signature 1) candidate)
-      )
+      (put-text-property 0 candidate-length 'end-signature (substring signature 1) candidate))
      (assignment
       (put-text-property 0 candidate-length 'kind 'assignment-method candidate)
-      (put-text-property 0 candidate-length 'assign-signature signature candidate)
-      ))))
+      (put-text-property 0 candidate-length 'assign-signature signature candidate)))))
 
 (defun magik-company--cb-method-candidates (prefix)
   "Return list of methods for a class matching PREFIX for auto-complete mode.

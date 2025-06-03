@@ -35,8 +35,7 @@
 Each entry is a double: (TYPE REGEX).")
 
 (defvar magik-company--class-assignment-patterns
-  '("\\s-*<<[ \t\n]*\\(\\S-+\\)\\.new")
-  )
+  '("\\s-*<<[ \t\n]*\\(\\S-+\\)\\.new"))
 
 (defun magik-company--try-method-exemplar-type (variable)
   "Retrieve the exemplar type based on what VARIABLE is."
@@ -59,7 +58,7 @@ Each entry is a double: (TYPE REGEX).")
 	(file-name-sans-extension (buffer-name)))))
 
 (defun magik-company--super-case (variable)
-  "Return the super exemplar type if variable is '_super'."
+  "Return the super exemplar type if VARIABLE is `_super'."
   (when (string-match "_super(\\([a-zA-Z_]+\\))" variable)
     (match-string 1 variable)))
 
@@ -86,7 +85,7 @@ Each entry is a double: (TYPE REGEX).")
 
 (defun magik-company--check-typed-params (variable)
   "Return the method parameter type for VARIABLE."
-  (when-let ((method-param-type (magik-company--method-param-type variable)))
+  (when-let* ((method-param-type (magik-company--method-param-type variable)))
     method-param-type))
 
 (defun magik-company--method-param-type (param-name)
@@ -109,7 +108,7 @@ PARAM-NAME ..."
 
 (defun magik-company--check-assignment-and-type (variable regex type)
   "Check if VARIABLE matches a REGEX pattern in the buffer.
-If matched, return TYPE-OR-CLASS, otherwise nil."
+If matched, return TYPE, otherwise nil."
   (save-excursion
     (if (re-search-backward (concat (regexp-quote variable) regex) nil t)
 	(progn
@@ -175,7 +174,7 @@ If matched, return TYPE-OR-CLASS, otherwise nil."
 ;; 		     when match return match))
 
 ;; 	   ;; Check typed params (use the stored result)
-;; 	    ((when-let ((method-param-type (magik-company--method-param-type variable)))
+;; 	    ((when-let* ((method-param-type (magik-company--method-param-type variable)))
 ;; 	      method-param-type))
 
 ;; 	    ;; default case
