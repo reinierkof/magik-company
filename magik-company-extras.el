@@ -25,9 +25,7 @@
 ;;; Code:
 (require 'company)
 
-(with-eval-after-load 'magik-mode
-  (add-hook 'magik-session-start-process-post-hook 'magik-company--kill-cb-ac-buffer))
-
+(add-hook 'magik-session-start-process-post-hook #'magik-company--kill-cb-ac-buffer)
 
 (defconst magik-company--cb-buffer "*cb-company*"
   "The autocomplete class browser buffer associated with the GIS process.")
@@ -44,7 +42,7 @@
 	(setq magik-company--cb-process nil)))))
 
 (defun magik-company--add-icon-to-alist (kind icon)
-  "Append a KIND to `company-vscode-icons-mapping` if it doesn't already exist."
+  "Append a KIND to ICON in `company-vscode-icons-mapping' if its new."
   (unless (assoc kind company-vscode-icons-mapping)
     (setq company-vscode-icons-mapping
 	  (append company-vscode-icons-mapping

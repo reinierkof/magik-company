@@ -36,7 +36,7 @@
 
 (defun magik-company--insert-param-yasnippet (list)
   "Insert a param yasnippet from LIST, each param is a tab and ends after the ')'."
-  (when (not (null list))
+  (when list
     (if (eq (char-before) ?\))
 	(progn
 	  (delete-char -1)

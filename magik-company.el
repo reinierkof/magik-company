@@ -52,7 +52,7 @@
   :group 'magik)
 
 ;;;###autoload
-(defun magik-company (command &optional arg &rest ignored)
+(defun magik-company (command &optional arg &rest _ignored)
   "Company backend for `magik-mode'.
 COMMAND, ARG, IGNORED"
   (interactive (list 'interactive))

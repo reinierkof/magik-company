@@ -26,6 +26,12 @@
 (defvar magik-company--cb-max-methods 1000)
 (defvar magik-company--session-running nil)
 
+(advice-add #'magik-session-kill-process :after
+            (lambda (&rest _args)
+              (setq magik-company--session-running nil)
+              (magik-company-reload-cache)
+              (magik-company--force-kill-cb-company-buffers)))
+
 (defun magik-company--cb-filter (p s)
   "Process data coming back from the CB auto-complete buffer.
 P ...
@@ -84,17 +90,9 @@ killing any associated processes without prompting."
 	  (delete-process proc))
 	(kill-buffer buf)))))
 
-(with-eval-after-load 'magik-mode
-  (advice-add 'magik-transmit-region :after #'magik-company-reload-cache)
-  (advice-add 'magik-session-kill-process :after (lambda (&rest args)
-						   (setq magik-company--session-running nil)
-						   (magik-company-reload-cache)
-						   (magik-company--force-kill-cb-company-buffers))
-	      ))
-
 (defun magik-company--magik-process-started?(gis-buffer-name)
-  "Poke to the magik-process to see if it has started.
- This is not a great solution because it might spam the terminal.
+  "Poke to the magik-process in GIS-BUFFER-NAME to see if it has started.
+This is not a great solution because it might spam the terminal.
 For now it's the only way to know whether,
  the process has loaded the method-finder etc."
   (interactive)

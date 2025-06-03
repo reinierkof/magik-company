@@ -37,6 +37,8 @@
 (defvar magik-company--conditions-source-cache nil)
 (defvar magik-company--class-method-source-cache nil)
 
+(advice-add #'magik-transmit-region :after #'magik-company-reload-cache)
+
 (defun magik-company-reload-cache (&rest _args)
   "Reset the caches such that they will refill upon triggering the prefix."
   (interactive)
