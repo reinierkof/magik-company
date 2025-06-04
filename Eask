@@ -1,4 +1,5 @@
-;;; -*- lexical-binding: t; -*-
+;; -*- mode: eask; lexical-binding: t -*-
+
 (package "magik-company"
          "0.1.0"
          "Magik backend for company-mode")
