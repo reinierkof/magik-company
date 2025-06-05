@@ -106,8 +106,13 @@
 (defun magik-company--at-global-prefix ()
   "Detect if the point is at a possible global."
   (save-excursion
-    (if (re-search-backward "^\\s-*\\(\\sw+\\)\\=" (line-beginning-position) t)
-	t
+    (if (re-search-backward "\\b\\(\\sw+\\)\\_>" (line-beginning-position) t)
+	(let ((start (match-beginning 0)))
+	  (if (and start
+		   (> start (point-min))
+		   (not (eq (char-before start) ?.)))
+	      t
+	    nil))
       nil)))
 
 (defun magik-company--at-object-prefix ()
@@ -115,12 +120,14 @@
 Allows for single words or two words connected with a ':'."
   (save-excursion
     (if (or
-	 (re-search-backward "\\b\\(\\sw+\\):\\(\\sw+\\)\\=" (line-beginning-position) t)
-	 (re-search-backward "\\b\\(\\sw+\\)\\=" (line-beginning-position) t))
-	(not (or (eq (following-char) ?.)
-		 (save-excursion
-		   (goto-char (match-beginning 0))
-		   (re-search-backward "\\." (line-beginning-position) t))))
+	 (re-search-backward "\\b\\(\\sw+\\):\\(\\sw+\\)\\_>" (line-beginning-position) t)
+	 (re-search-backward "\\b\\(\\sw+\\)\\_>" (line-beginning-position) t))
+	(let ((start (match-beginning 0)))
+	  (if (and start
+		   (> start (point-min))
+		   (not (eq (char-before start) ?.)))
+	      t
+	    nil))
       nil)))
 
 (provide 'magik-company-prefixes)
