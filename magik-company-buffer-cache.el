@@ -86,12 +86,14 @@
 			   (match-string 1))))))
     (when params
       (setq params (mapcar #'string-trim (split-string params "," t)))
-      (setq params (cl-remove-if (lambda (param)
-				   (or (string-suffix-p "_optional" param)
-				       (string-suffix-p "_gather" param)))
-				 params)))
-
-    params))
+      (setq params
+            (cl-loop for param in params
+                     if (or (string-prefix-p "_optional" param)
+                            (string-prefix-p "_gather" param))
+                     collect (nth 1 (split-string param " "))
+                     else
+                     collect param)))
+      params))
 
 (defun magik-company--exemplar-slots ()
   "Retrieve the slots from a exemplar or mixin."
