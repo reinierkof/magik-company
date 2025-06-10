@@ -52,6 +52,29 @@
   :group 'magik)
 
 ;;;###autoload
+(define-minor-mode magik-company-mode
+  "Minor mode to enable the Magik company backend."
+  :lighter "ⓂComplete"
+  (if magik-company-mode
+      (magik-company--enable)
+    (magik-company--disable)))
+
+(defun magik-company--enable ()
+  "Set up buffer for `magik-company-mode`."
+  (make-local-variable 'company-backends)
+  (add-to-list 'company-backends 'magik-company)
+  (advice-add #'magik-transmit-region :after #'magik-company-reload-cache)
+  (advice-add #'magik-session-kill-process :after #'magik-company--exit-cb-buffers)
+  (add-hook 'magik-session-start-process-post-hook #'magik-company--kill-cb-ac-buffer))
+
+(defun magik-company--disable ()
+  "Tear down `magik-company-mode` in this buffer."
+  (setq company-backends (remove 'magik-company company-backends))
+  (advice-remove #'magik-transmit-region #'magik-company-reload-cache)
+  (advice-remove #'magik-session-kill-process #'magik-company--exit-cb-buffers)
+  (remove-hook 'magik-session-start-process-post-hook #'magik-company--kill-cb-ac-buffer))
+
+;;;###autoload
 (defun magik-company (command &optional arg &rest _ignored)
   "Company backend for `magik-mode'.
 COMMAND, ARG, IGNORED"

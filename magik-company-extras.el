@@ -25,8 +25,6 @@
 ;;; Code:
 (require 'company)
 
-(add-hook 'magik-session-start-process-post-hook #'magik-company--kill-cb-ac-buffer)
-
 (defconst magik-company--cb-buffer "*cb-company*"
   "The autocomplete class browser buffer associated with the GIS process.")
 
