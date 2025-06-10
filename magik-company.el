@@ -45,6 +45,7 @@
 (defvar magik-company--variables-candidates nil)
 (defvar magik-company--slots-candidates nil)
 (defvar magik-company--exemplar-candidate nil)
+(defvar magik-company--initialised? nil)
 
 (defgroup magik-company nil
   "Company back-end for Magik code completion."
@@ -54,7 +55,7 @@
 ;;;###autoload
 (define-minor-mode magik-company-mode
   "Minor mode to enable the Magik company backend."
-  :lighter "ⓂComplete"
+  :lighter nil
   (if magik-company-mode
       (magik-company--enable)
     (magik-company--disable)))
@@ -63,16 +64,15 @@
   "Set up buffer for `magik-company-mode`."
   (make-local-variable 'company-backends)
   (add-to-list 'company-backends 'magik-company)
-  (advice-add #'magik-transmit-region :after #'magik-company-reload-cache)
-  (advice-add #'magik-session-kill-process :after #'magik-company--exit-cb-buffers)
-  (add-hook 'magik-session-start-process-post-hook #'magik-company--kill-cb-ac-buffer))
+  (unless magik-company--initialised?
+    (advice-add #'magik-transmit-region :after #'magik-company-reload-cache)
+    (advice-add #'magik-session-kill-process :after #'magik-company--exit-cb-buffers)
+    (add-hook 'magik-session-start-process-post-hook #'magik-company--kill-cb-ac-buffer)
+    (setq magik-company--initialised? t)))
 
 (defun magik-company--disable ()
   "Tear down `magik-company-mode` in this buffer."
-  (setq company-backends (remove 'magik-company company-backends))
-  (advice-remove #'magik-transmit-region #'magik-company-reload-cache)
-  (advice-remove #'magik-session-kill-process #'magik-company--exit-cb-buffers)
-  (remove-hook 'magik-session-start-process-post-hook #'magik-company--kill-cb-ac-buffer))
+  (setq company-backends (remove 'magik-company company-backends)))
 
 ;;;###autoload
 (defun magik-company (command &optional arg &rest _ignored)
