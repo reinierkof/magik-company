@@ -3,7 +3,7 @@
 ;; Package-Version: 0.1.0
 ;; Package-Requires: ((emacs "29.1") (magik-mode "0.4.1") (company "1.0.2") (yasnippet "0.14.0"))
 ;; URL: https://github.com/reinierkof/magik-company
-;; Keywords:
+;; Keywords: convenience
 
 ;; Copyright (C) 2024 Reinier Koffijberg
 
@@ -45,11 +45,34 @@
 (defvar magik-company--variables-candidates nil)
 (defvar magik-company--slots-candidates nil)
 (defvar magik-company--exemplar-candidate nil)
+(defvar magik-company--initialised? nil)
 
 (defgroup magik-company nil
   "Company back-end for Magik code completion."
   :group 'company
   :group 'magik)
+
+;;;###autoload
+(define-minor-mode magik-company-mode
+  "Minor mode to enable the Magik company backend."
+  :lighter nil
+  (if magik-company-mode
+      (magik-company--enable)
+    (magik-company--disable)))
+
+(defun magik-company--enable ()
+  "Set up buffer for `magik-company-mode`."
+  (make-local-variable 'company-backends)
+  (add-to-list 'company-backends 'magik-company)
+  (unless magik-company--initialised?
+    (advice-add #'magik-transmit-region :after #'magik-company-reload-cache)
+    (advice-add #'magik-session-kill-process :after #'magik-company--exit-cb-buffers)
+    (add-hook 'magik-session-start-process-post-hook #'magik-company--kill-cb-ac-buffer)
+    (setq magik-company--initialised? t)))
+
+(defun magik-company--disable ()
+  "Tear down `magik-company-mode` in this buffer."
+  (setq company-backends (remove 'magik-company company-backends)))
 
 ;;;###autoload
 (defun magik-company (command &optional arg &rest _ignored)

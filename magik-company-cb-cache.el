@@ -37,8 +37,6 @@
 (defvar magik-company--conditions-source-cache nil)
 (defvar magik-company--class-method-source-cache nil)
 
-(advice-add #'magik-transmit-region :after #'magik-company-reload-cache)
-
 (declare-function magik-company--exemplar-near-point "magik-company")
 
 (defun magik-company-reload-cache (&rest _args)
@@ -85,7 +83,7 @@ PREFIX the current prefix"
     magik-company--class-method-source-cache))
 
 (defun magik-company--objects-source-init (&optional reset)
-  "Initialisation function for obtaining all Magik Objects for use in company-mode.
+  "Init function for obtaining all Magik Objects for use in `company-mode'.
 If RESET is true, the cache is regenerated."
   (when (magik-company--cb-start-process)
     (when (or (not magik-company--objects-source-cache-loaded) reset)
@@ -94,7 +92,7 @@ If RESET is true, the cache is regenerated."
 	(setq magik-company--objects-source-cache-loaded t)))))
 
 (defun magik-company--globals-source-init (&optional reset)
-  "Initialisation function for obtaining all Magik Globals for use in company-mode.
+  "Init function for obtaining all Magik Globals for use in `company-mode'.
 If RESET is true, the cache is regenerated."
   (when (magik-company--cb-start-process)
     (when (or (not magik-company--globals-source-cache-loaded) reset)
@@ -103,8 +101,7 @@ If RESET is true, the cache is regenerated."
 	(setq magik-company--globals-source-cache-loaded t)))))
 
 (defun magik-company--conditions-source-init (&optional reset)
-  "Initialisation function for obtaining all Magik Conditions.
-Magik conditions are for use in company-mode.
+  "Init function for obtaining all Magik Conditions for use in `company-mode'.
 If RESET is true, the cache is regenerated."
   (when (magik-company--cb-start-process)
     (when (or (not magik-company--conditions-source-cache-loaded) reset)

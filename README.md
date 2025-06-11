@@ -10,8 +10,9 @@
 ## Requirements
 
 This package requires:
-Magik mode with a version 0.4.1 or higher. [magik-mode](https://melpa.org/#/magik-mode)
-Emacs version 29.1 or higher.
+
+- Magik mode with a version 0.4.1 or higher. [magik-mode](https://melpa.org/#/magik-mode)
+- Emacs version 29.1 or higher.
 
 ## Installation
 
@@ -23,8 +24,7 @@ The alternative, and recommended, way of installing this backend is using [use-p
 ```emacs-lisp
 (use-package magik-company
   :after company
-  :config
-  (add-to-list 'company-backends 'magik-company))
+  :hook (magik-base-mode . magik-company-mode))
 ```
 
 ## Features

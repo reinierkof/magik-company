@@ -25,6 +25,7 @@
 ;;; Code:
 (require 'magik-mode)
 (require 'magik-company-treesitter-extras)
+(require 'magik-doc-gen)
 
 (defvar magik-company--params-cache nil)
 (defvar magik-company--variables-cache nil)

@@ -28,11 +28,11 @@
 
 (declare-function magik-company-reload-cache "magik-company")
 
-(advice-add #'magik-session-kill-process :after
-	    (lambda (&rest _args)
-	      (setq magik-company--session-running nil)
-              (magik-company-reload-cache)
-	      (magik-company--force-kill-cb-company-buffers)))
+(defun magik-company--exit-cb-buffers ()
+    "Ensure cb buffers are deleted and status is reset."
+    (setq magik-company--session-running nil)
+    (magik-company-reload-cache)
+    (magik-company--force-kill-cb-company-buffers))
 
 (defun magik-company--cb-filter (p s)
   "Process data coming back from the CB auto-complete buffer.

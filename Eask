@@ -5,6 +5,7 @@
          "Magik backend for company-mode")
 
 (website-url "https://github.com/reinierkof/magik-company")
+(keywords "convenience")
 
 (package-file "magik-company.el")
 (files "*.el")
