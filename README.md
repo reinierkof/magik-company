@@ -23,8 +23,7 @@ The alternative, and recommended, way of installing this backend is using [use-p
 
 ```emacs-lisp
 (use-package magik-company
-  :after company
-  :hook (magik-base-mode . magik-company-mode))
+  :hook (magik-ts-mode . magik-company-mode))
 ```
 
 ## Features
@@ -35,10 +34,23 @@ Caching is used to minimalize the usage of your local resources.
 Any time one transmits to magik (buffer or local) the cache is refreshed.
 magik-company-reload-cache can be used to manually refresh the cache.
 
+Expect a slight delay in typing after using f2-b or f2-RET.
+
 ### Yasnippet completion
 
 When a yasnippet is found it is automatically completed when the autocomplete is done.
-When a method is completed the parameters are automatically inserted as yasnippet (optional can be toggled)
+When a method is completed the parameters are automatically inserted as yasnippet.
+This can be toggled with:
+```emacs-lisp
+(setq magik-company-insert-params nil/t)
+```
+
+Similarly optional parameters (default off) and the gather parameter (default on) can be inserted into the parameter snippet.
+Configurate with:
+```emacs-lisp
+(setq magik-company-insert-optional-params nil/t)
+(setq magik-company-insert-gather-param nil/t)
+```
 
 ### Variables
 
@@ -57,6 +69,27 @@ The type is available when:
 - a variable assigned by one of the basic types: {integer, float, char16_vector, simple_vector}
 - a variable assigned with a new* method
 
+### Method annotations
+
+When a method is being shown as a candidate, the following information will be shown:
+
+- (I) if the method is an iterator method
+- <param1, param2> the parameters of the function
+- <param1, _optional param2> the optional parameters of the function
+- <param1, _gather param2> the gather parameters of a function.
+
+Showing parameters, optional or gather (all default on) can be configured with:
+
+```emacs-lisp
+(setq magik-company-show-optional-params-annotation nil/t)
+(setq magik-company-show-gather-param-annotation nil/t)
+(setq magik-company-show-params-annotation nil/t)
+```
+
+### Variable annotations
+
+Shows the origin package if available.
+
 ### Objects
 
 All loaded in exemplars will be available as objects.
@@ -69,3 +102,8 @@ Slots defined on the exemplar in this scope, slots have to be defined in the fil
 
 Currently this is bound to one session, when there are multiple sessions running there is no control over which session is being used.
 Magik is soft typed so quite often it is hard to determine the current exemplar to use for completion.
+
+## Known bugs
+
+When a session is started with a method_finder and the session starts loading files,
+Typing in a .magik buffer will be blocked by a CB cannot start error.
