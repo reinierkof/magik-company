@@ -25,6 +25,7 @@
 
 (defvar magik-company--cb-max-methods 1000)
 (defvar magik-company--session-running nil)
+(defvar magik-company--cb-candidadates nil)
 
 (declare-function magik-company-reload-cache "magik-company")
 
@@ -52,12 +53,12 @@ S ..."
 			   (t
 			    nil))))
 	  (setq magik-cb-filter-str ""
-		magik-cb--ac-candidates (if fn
+		magik-company--cb-candidadates (if fn
 					    (progn
 					      (insert-file-contents (magik-cb-temp-file-name p) nil nil nil t)
 					      (funcall fn)))))
       (setq magik-cb-filter-str ""
-	    magik-cb--ac-candidates (if (eq magik-cb--ac-candidates 'unset) nil magik-cb--ac-candidates)))))
+	    magik-company--cb-candidadates (if (eq magik-company--cb-candidadates 'unset) nil magik-company--cb-candidadates)))))
 
 (defun magik-company--cb-start-process ()
   "Start a Class Browser process for auto-complete-mode.
@@ -294,14 +295,14 @@ DOCUMENTATION ..."
 (defun magik-company--cb-method-candidates (prefix)
   "Return list of methods for a class matching PREFIX for auto-complete mode.
 PREFIX is of the form \"CLASS\".\"METHOD_NAME_PREFIX\""
-  (let ((magik-cb--ac-candidates 'unset) ; use 'unset symbol since nil is also a valid return value.
+  (let ((magik-company--cb-candidadates 'unset) ; use 'unset symbol since nil is also a valid return value.
 	(ac-limit 1000)
 	class method character)
     (save-match-data
       (cond ((null magik-company--cb-process)
-	     (setq magik-cb--ac-candidates nil))
+	     (setq magik-company--cb-candidadates nil))
 	    ((not (string-match "\\(\\S-+\\)\\.\\(.*\\)" prefix))
-	     (setq magik-cb--ac-candidates nil))
+	     (setq magik-company--cb-candidadates nil))
 	    (t
 	     (setq class (match-string-no-properties 1 prefix)
 		   method (match-string-no-properties 2 prefix)
@@ -311,24 +312,24 @@ PREFIX is of the form \"CLASS\".\"METHOD_NAME_PREFIX\""
 					  "unadd class \nadd class " class "\n"
 					  "method_cut_off " (number-to-string ac-limit) "\n"
 					  "override_flags\nshow_classes\nshow_args\nshow_comments\nprint_curr_methods\nshow_topics\n"))
-	     (while (and (eq magik-cb--ac-candidates 'unset)
+	     (while (and (eq magik-company--cb-candidadates 'unset)
 			 (magik-cb-is-running nil magik-company--cb-process))
 	       (sleep-for 0.1))
-	     (setq magik-cb--ac-candidates (append (list (concat " " class "." character)) magik-cb--ac-candidates)))))
-    magik-cb--ac-candidates))
+	     (setq magik-company--cb-candidadates (append (list (concat " " class "." character)) magik-company--cb-candidadates)))))
+    magik-company--cb-candidadates))
 
 (defun magik-company--cb-class-candidates (prefix)
   "Return list of classes matching PREFIX for auto-complete mode."
-  (let ((magik-cb--ac-candidates 'unset)) ; use 'unset symbol since nil is also a valid return value.
+  (let ((magik-company--cb-candidadates 'unset)) ; use 'unset symbol since nil is also a valid return value.
     (cond ((null magik-company--cb-process)
-	   (setq magik-cb--ac-candidates nil))
+	   (setq magik-company--cb-candidadates nil))
 	  (t
 	   (process-send-string magik-company--cb-process
 				(concat "dont_override_flags\npr_family " prefix "\n"))
-	   (while (and (eq magik-cb--ac-candidates 'unset)
+	   (while (and (eq magik-company--cb-candidadates 'unset)
 		       (magik-cb-is-running nil magik-company--cb-process))
 	     (sleep-for 0.1))))
-    magik-cb--ac-candidates))
+    magik-company--cb-candidadates))
 
 (provide 'magik-company-cb)
 ;;; magik-company-cb.el ends here
