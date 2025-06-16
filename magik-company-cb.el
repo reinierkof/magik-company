@@ -180,7 +180,7 @@ Stores the buffer name in `magik-company--cb-gis-buffer-name`
 	  (while (not (looking-at "$"))
 	    (setq pt (point))
 	    (cond ((looking-at "\\(OPT \\)?GATH \\(.*\\)")
-		   (setq gather (buffer-substring-no-properties (match-beginning 2) (match-end 2)))
+		   (setq gather (list (buffer-substring-no-properties (match-beginning 2) (match-end 2))))
 		   (goto-char (match-end 0)))
 		  ((looking-at "OPT ")
 		   (setq opt t)

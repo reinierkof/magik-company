@@ -59,20 +59,29 @@ Also ensures it is a list of strings."
 Making the arguments italic."
   (when magik-company-show-optional-params-annotation
     (let ((params (get-text-property 0 'optional candidate)))
-      (when (listp params)
-	(mapcar (lambda (a-param)
+      (when (and (listp params) params)
+	(let ((annotated (mapcar (lambda (a-param)
 		  (propertize (format "%s" a-param) 'face '(:slant italic)))
-		params)))))
+		                 params)))
+      (setf (nth 0 annotated)
+                (propertize (format "_optional %s" (nth 0 annotated))
+                            'face '(:slant italic)))
+        annotated)))))
+
 
 (defun magik-company--annotation-gather-param (candidate)
   "Retrieve the gather arguments text property from CANDIDATE.
 Making the arguments italic."
   (when magik-company-show-gather-param-annotation
     (let ((params (get-text-property 0 'gather candidate)))
-      (when (listp params)
-	(mapcar (lambda (a-param)
+      (when (and (listp params) params)
+        (let ((annotated (mapcar (lambda (a-param)
 		  (propertize (format "%s" a-param) 'face '(:slant italic)))
-		params)))))
+		                params)))
+        (setf (nth 0 annotated)
+                (propertize (format "_gather %s" (nth 0 annotated))
+                            'face '(:slant italic)))
+        annotated)))))
 
 (provide 'magik-company-annotation)
 ;;; magik-company-annotation.el ends here
