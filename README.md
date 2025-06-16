@@ -41,12 +41,14 @@ Expect a slight delay in typing after using f2-b or f2-RET.
 When a yasnippet is found it is automatically completed when the autocomplete is done.
 When a method is completed the parameters are automatically inserted as yasnippet.
 This can be toggled with:
+
 ```emacs-lisp
 (setq magik-company-insert-params nil/t)
 ```
 
 Similarly optional parameters (default off) and the gather parameter (default on) can be inserted into the parameter snippet.
-Configurate with:
+Configure with:
+
 ```emacs-lisp
 (setq magik-company-insert-optional-params nil/t)
 (setq magik-company-insert-gather-param nil/t)
