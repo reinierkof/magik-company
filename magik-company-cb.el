@@ -112,7 +112,7 @@ killing any associated processes without prompting."
       )))
 
 (defun magik-company--method-finder-started?(gis-buffer-name)
-  "Poke to the magik-process in GIS-BUFFER-NAME to see if the method-finder is started."
+  "Poke the magik-process in GIS-BUFFER-NAME if the method-finder is started."
   (let ((smallworld-gis (get-buffer-process (get-buffer gis-buffer-name))))
     (if smallworld-gis
 	(progn
