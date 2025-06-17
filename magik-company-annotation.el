@@ -45,6 +45,7 @@
 			      (when args
 				(concat "<" (mapconcat #'identity args ", ") ">")))))))
     (when (get-text-property 0 'iter candidate) (setq result (concat "(I) " result)))
+    (when (get-text-property 0 'yasnippet candidate) (setq result (concat "(Y) " result)))
     result))
 
 (defun magik-company--annotation-required-params (candidate)
