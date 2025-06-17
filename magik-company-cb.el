@@ -93,7 +93,7 @@ killing any associated processes without prompting."
 	(kill-buffer buf)))))
 
 (defun magik-company--magik-session-started?(gis-buffer-name)
-  "Check in the buffer from GIS-BUFFER-NAME whether session is initalized."
+  "Check in the buffer from GIS-BUFFER-NAME whether session is initialized."
   (let ((session-started?
 	 (with-current-buffer gis-buffer-name
 	   (goto-char (point-max))
