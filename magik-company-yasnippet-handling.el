@@ -67,13 +67,14 @@ Insert them depending on settings."
   (let ((arguments-to-insert nil))
     (when magik-company-insert-params
       (when (magik-company--candidate-is-method candidate)
-	(setq arguments-to-insert (nconc arguments-to-insert
-					 (get-text-property 0 'arguments candidate)))
+	(setq arguments-to-insert (append arguments-to-insert
+					  (get-text-property 0 'arguments candidate)))
 	(when magik-company-insert-optional-params
-	  (setq arguments-to-insert (nconc arguments-to-insert
-					   (get-text-property 0 'optional candidate))))
-	(when (and magik-company-insert-gather-param (get-text-property 0 'gather candidate))
-	  (setq arguments-to-insert (nconc arguments-to-insert (list "gather"))))
+	  (setq arguments-to-insert (append arguments-to-insert
+					    (get-text-property 0 'optional candidate))))
+	(when magik-company-insert-gather-param
+	  (setq arguments-to-insert (append arguments-to-insert
+					    (get-text-property 0 'gather candidate))))
 	(magik-company--insert-param-yasnippet arguments-to-insert)))))
 
 (defun magik-company--candidate-is-method(candidate)
