@@ -119,23 +119,35 @@
 	  (push (substring-no-properties (treesit-node-text child)) variables)))))
   variables)
 
+(defun magik-company--ts-for-local-variables-in-scope(node variables)
+  "VARIABLES gained in the for loop statement in a NODE."
+  (let ((children (treesit-node-children node))
+	(found nil))
+    (dolist (child children)
+      (when (string= (treesit-node-text child) "<<")
+	(setq found t))
+      (when (and (not found)
+		 (string= (treesit-node-type child) "identifier"))
+	(push (substring-no-properties (treesit-node-text child)) variables))))
+  variables)
+
 (defun magik-company--ts-exemplar-node-in-buffer-for (exemplar-name)
   "Exemplar node in buffer for EXEMPLAR-NAME."
   (cdr (assoc 'exemplar-node (treesit-query-capture
-                              (treesit-buffer-root-node)
-                              (format
-                               "
+			      (treesit-buffer-root-node)
+			      (format
+			       "
 ((invoke receiver: (variable) @var (symbol) @sym) @exemplar-node
 (#match %S @var) (#match %S @sym))"
-                               "^def_slotted_exemplar$"
-                               (concat "^:" exemplar-name "$"))))))
+			       "^def_slotted_exemplar$"
+			       (concat "^:" exemplar-name "$"))))))
 
 (defun magik-company--ts-current-exemplar-node-with-locs ()
   "Exemplar node with the locations."
   (let* ((exemplar-node (magik-company--ts-exemplar-node-in-buffer-for
-                         (magik-company--ts-exemplar-of-enclosing-method)))
-         (start-loc (and exemplar-node (treesit-node-start exemplar-node)))
-         (end-loc (and exemplar-node (treesit-node-end exemplar-node))))
+			 (magik-company--ts-exemplar-of-enclosing-method)))
+	 (start-loc (and exemplar-node (treesit-node-start exemplar-node)))
+	 (end-loc (and exemplar-node (treesit-node-end exemplar-node))))
     `((:node . ,exemplar-node)
       (:start . ,start-loc)
       (:end . ,end-loc))))
@@ -150,7 +162,9 @@
       (dolist (a-node (magik-company--ts-node-type-in-scope scope "assignment"))
 	(setq variables (magik-company--ts-lhs-variables-in-assignment-node a-node variables)))
       (dolist (a-node (magik-company--ts-node-type-in-scope scope "iterator"))
-	(setq variables (magik-company--ts-for-loop-variables-in-scope a-node variables))))
+	(setq variables (magik-company--ts-for-loop-variables-in-scope a-node variables)))
+      (dolist (a-node (magik-company--ts-node-type-in-scope scope "local"))
+	(setq variables (magik-company--ts-for-local-variables-in-scope a-node variables))))
     (delete-dups variables)))
 
 (provide 'magik-company-treesitter-extras)
