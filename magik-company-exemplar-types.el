@@ -128,7 +128,7 @@ If matched, return TYPE, otherwise nil."
 	    exemplar)
 	(goto-char pt)
 	;; Usefully skip over various syntax types:
-	(if (not (zerop (skip-syntax-backward "w_().")))
+	(if (not (zerop (skip-syntax-backward "w_.")))
 	    (setq variable (buffer-substring-no-properties (point) pt)))
 	(if variable
 	    (setq exemplar (magik-company--try-method-exemplar-type variable)))
