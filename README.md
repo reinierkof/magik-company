@@ -11,7 +11,7 @@
 
 This package requires:
 
-- Magik mode with a version 0.4.1 or higher. [magik-mode](https://melpa.org/#/magik-mode)
+- Magik mode with a version 0.5.1 or higher. [magik-mode](https://melpa.org/#/magik-mode)
 - Emacs version 29.1 or higher.
 
 ## Installation
@@ -23,7 +23,8 @@ The alternative, and recommended, way of installing this backend is using [use-p
 
 ```emacs-lisp
 (use-package magik-company
-  :hook (magik-ts-mode . magik-company-mode))
+  :hook (magik-ts-mode . magik-company-mode)
+        (magik-session-mode . magik-company-mode))
 ```
 
 ## Features
@@ -34,7 +35,9 @@ Caching is used to minimalize the usage of your local resources.
 Any time one transmits to magik (buffer or local) the cache is refreshed.
 magik-company-reload-cache can be used to manually refresh the cache.
 
-Expect a slight delay in typing after using f2-b or f2-RET.
+Expect a slight delay in typing after using f2-b, f2-RET or magik-company-reload-cache.
+
+When typing on a new line the buffer local cache (only for magik-ts-mode) is refreshed.
 
 ### Yasnippet completion
 
@@ -88,13 +91,17 @@ Showing parameters, optional or gather (all default on) can be configured with:
 (setq magik-company-show-params-annotation nil/t)
 ```
 
-### Variable annotations
+### Variable/Object annotations
 
-Shows the origin package if available.
+When a variable/object is being shown as a candidate, the following information will be shown:
+
+- (Y) if the candidate is a yasnippet.
+- <package_name> the origin package of the global if available.
 
 ### Objects
 
 All loaded in exemplars will be available as objects.
+All yassnippets will be seen as objects.
 
 ### Slots
 
@@ -104,8 +111,3 @@ Slots defined on the exemplar in this scope, slots have to be defined in the fil
 
 Currently this is bound to one session, when there are multiple sessions running there is no control over which session is being used.
 Magik is soft typed so quite often it is hard to determine the current exemplar to use for completion.
-
-## Known bugs
-
-When a session is started with a method_finder and the session starts loading files,
-Typing in a .magik buffer will be blocked by a CB cannot start error.
