@@ -55,6 +55,16 @@
 		  (yas--get-snippet-tables major-mode))
 	     :key #'yas--template-key :test #'string=)))
 
+(defun magik-company--candidate-yasnippets (key)
+  "Return all yasnippets whose keys start with KEY in the current major mode."
+  (let ((yas-choose-tables-first nil)
+	(yas-choose-keys-first nil))
+    (mapcar #'yas--template-key
+	    (seq-filter (lambda (tpl)
+			  (string-prefix-p key (yas--template-key tpl)))
+			(yas--all-templates
+			 (yas--get-snippet-tables major-mode))))))
+
 (defun magik-company--insert-candidate-yasnippet(candidate)
   "Insert the yasnippet from CANDIDATE as post completion."
   (let ((a-snippet (magik-company--candidate-is-yasnippet candidate)))
