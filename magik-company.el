@@ -95,8 +95,8 @@ COMMAND, ARG, IGNORED"
   "Prefix and what to load based on those the current point."
   (if (or (magik-company--in-comment)
 	  (magik-company--in-string)
-          (and (string= magik-company--major-mode magik-company--session-mode)
-               (not (magik-company--session-within-typeable-area))))
+	  (and (string= magik-company--major-mode magik-company--session-mode)
+	       (not (magik-company--session-within-typeable-area))))
       (setq magik-company-prefix-at-methods nil
 	    magik-company-prefix-at-conditions nil
 	    magik-company-prefix-at-dynamics nil
@@ -128,11 +128,11 @@ COMMAND, ARG, IGNORED"
 
     (when magik-company-prefix-at-objects
       (setq magik-company--objects-candidates
-            (magik-company--filter-candidates magik-company--objects-source-cache magik-candidates))
+	    (magik-company--filter-candidates magik-company--objects-source-cache magik-candidates))
       (setq magik-candidates (append magik-candidates magik-company--objects-candidates))
 
       (setq magik-company--snippets-candidates
-            (magik-company--filter-candidates (magik-company--candidate-yasnippets magik-company-cur-prefix) magik-candidates))
+	    (magik-company--filter-candidates (magik-company--candidate-yasnippets magik-company-cur-prefix) magik-candidates))
       (setq magik-candidates (append magik-candidates magik-company--snippets-candidates)))
 
     (when magik-company-prefix-at-methods
