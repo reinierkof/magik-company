@@ -23,6 +23,7 @@
 ;;
 
 ;;; Code:
+(require 'magik-session)
 (defvar magik-company-cur-prefix nil)
 (defvar magik-company-prefix-at-methods nil)
 (defvar magik-company-prefix-at-conditions nil)
@@ -30,25 +31,6 @@
 (defvar magik-company-prefix-at-globals nil)
 (defvar magik-company-prefix-at-objects nil)
 (defvar magik-company-prefix-at-slot nil)
-
-(defun magik-company--prefix ()
-  "Prefix and what to load based on those the current point."
-  (if (or (magik-company--in-comment)
-	  (magik-company--in-string))
-      (setq magik-company-prefix-at-methods nil
-	    magik-company-prefix-at-conditions nil
-	    magik-company-prefix-at-dynamics nil
-	    magik-company-prefix-at-globals nil
-	    magik-company-prefix-at-slot nil
-	    magik-company-prefix-at-objects nil)
-    (progn
-      (setq magik-company-prefix-at-methods (magik-company--at-method-prefix)
-	    magik-company-prefix-at-conditions (magik-company--at-raise-condition-prefix)
-	    magik-company-prefix-at-dynamics (magik-company--at-dynamic-prefix)
-	    magik-company-prefix-at-globals (magik-company--at-global-prefix)
-	    magik-company-prefix-at-slot (magik-company--at-slot-prefix)
-	    magik-company-prefix-at-objects (magik-company--at-object-prefix)))
-    (magik-company--determine-cur-prefix)))
 
 (defun magik-company--determine-cur-prefix()
   "The prefix from recent characters."
@@ -129,6 +111,18 @@ Allows for single words or two words connected with a ':'."
 	      t
 	    nil))
       nil)))
+
+(defun magik-company--session-within-typeable-area()
+  "Detect if we are in a command."
+  (save-excursion
+    (let ((cursor-loc (point)))
+      (goto-char (point-max))
+      (let ((magik-prefix-pos (save-excursion (when (re-search-backward magik-session-prompt nil t)
+						(match-end 0)))))
+        (if (and (number-or-marker-p magik-prefix-pos)
+                 (>= cursor-loc magik-prefix-pos))
+            t
+        nil)))))
 
 (provide 'magik-company-prefixes)
 ;;; magik-company-prefixes.el ends here

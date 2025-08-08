@@ -97,7 +97,7 @@ killing any associated processes without prompting."
   (let ((session-started?
 	 (with-current-buffer gis-buffer-name
 	   (goto-char (point-max))
-	   (let ((magik-prefix-pos (save-excursion (when (re-search-backward "Magik>" nil t)
+	   (let ((magik-prefix-pos (save-excursion (when (re-search-backward magik-session-prompt nil t)
 						     (match-beginning 0))))
 		 (magik-end-process-pos (save-excursion (when (re-search-backward "Process magik-session-process" nil t)
 							  (match-beginning 0)))))
