@@ -37,6 +37,8 @@ magik-company-reload-cache can be used to manually refresh the cache.
 
 Expect a slight delay in typing after using f2-b, f2-RET or magik-company-reload-cache.
 
+When typing on a new line the buffer local cache (only for magik-ts-mode) is refreshed.
+
 ### Yasnippet completion
 
 When a yasnippet is found it is automatically completed when the autocomplete is done.
@@ -99,6 +101,7 @@ When a variable/object is being shown as a candidate, the following information 
 ### Objects
 
 All loaded in exemplars will be available as objects.
+All yassnippets will be seen as objects.
 
 ### Slots
 
