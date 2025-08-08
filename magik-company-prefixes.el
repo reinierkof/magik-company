@@ -23,6 +23,7 @@
 ;;
 
 ;;; Code:
+(require 'magik-session)
 (defvar magik-company-cur-prefix nil)
 (defvar magik-company-prefix-at-methods nil)
 (defvar magik-company-prefix-at-conditions nil)
@@ -116,7 +117,7 @@ Allows for single words or two words connected with a ':'."
   (save-excursion
     (let ((cursor-loc (point)))
       (goto-char (point-max))
-      (let ((magik-prefix-pos (save-excursion (when (re-search-backward "Magik>" nil t)
+      (let ((magik-prefix-pos (save-excursion (when (re-search-backward magik-session-prompt nil t)
 						(match-end 0)))))
         (if (and (number-or-marker-p magik-prefix-pos)
                  (>= cursor-loc magik-prefix-pos))
