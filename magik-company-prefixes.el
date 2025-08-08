@@ -119,10 +119,10 @@ Allows for single words or two words connected with a ':'."
       (goto-char (point-max))
       (let ((magik-prefix-pos (save-excursion (when (re-search-backward magik-session-prompt nil t)
 						(match-end 0)))))
-        (if (and (number-or-marker-p magik-prefix-pos)
-                 (>= cursor-loc magik-prefix-pos))
-            t
-        nil)))))
+	(if (and (number-or-marker-p magik-prefix-pos)
+		 (>= cursor-loc magik-prefix-pos))
+	    t
+	  nil)))))
 
 (provide 'magik-company-prefixes)
 ;;; magik-company-prefixes.el ends here

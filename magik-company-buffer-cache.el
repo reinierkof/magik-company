@@ -88,22 +88,22 @@
     (when params
       (setq params (mapcar #'string-trim (split-string params "," t)))
       (setq params
-            (cl-loop for param in params
-                     if (or (string-prefix-p "_optional" param)
-                            (string-prefix-p "_gather" param))
-                     collect (nth 1 (split-string param " "))
-                     else
-                     collect param)))
-      params))
+	    (cl-loop for param in params
+		     if (or (string-prefix-p "_optional" param)
+			    (string-prefix-p "_gather" param))
+		     collect (nth 1 (split-string param " "))
+		     else
+		     collect param)))
+    params))
 
 (defun magik-company--exemplar-slots ()
   "Retrieve the slots from a exemplar or mixin."
   (let ((slots '())
-        (exemplar-data (magik-company--ts-current-exemplar-node-with-locs)))
+	(exemplar-data (magik-company--ts-current-exemplar-node-with-locs)))
     (when (alist-get :node exemplar-data)
       (let ((slotted-loc (alist-get :start exemplar-data))
-            (dollar-loc (alist-get :end exemplar-data)))
-        (save-excursion
+	    (dollar-loc (alist-get :end exemplar-data)))
+	(save-excursion
 	  (goto-char slotted-loc)
 	  (while (re-search-forward "{\\s-*:\\(\\sw+\\)\\s-*,\\s-*\\(_unset\\)\\s-*" dollar-loc t)
 	    (push (match-string 1) slots)))))

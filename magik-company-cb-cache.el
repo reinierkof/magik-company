@@ -75,9 +75,9 @@ PREFIX the current prefix"
 	(progn
 	  (setq short-prefix (concat exemplar "." (if (> (length short-prefix) 0) (substring short-prefix 0 1))))
 	  (when (not (and magik-company--class-method-source-cache
-			(equal (concat " " short-prefix) (car magik-company--class-method-source-cache))))
-		(when (magik-company--cb-start-process)
-		  (setq magik-company--class-method-source-cache (magik-company--cb-method-candidates short-prefix)))))
+			  (equal (concat " " short-prefix) (car magik-company--class-method-source-cache))))
+	    (when (magik-company--cb-start-process)
+	      (setq magik-company--class-method-source-cache (magik-company--cb-method-candidates short-prefix)))))
       (setq magik-company--class-method-source-cache nil))
     magik-company--class-method-source-cache))
 
