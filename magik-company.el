@@ -118,7 +118,7 @@ COMMAND, ARG, IGNORED"
 
   (let ((magik-candidates '()))
     (when (string= magik-company--major-mode magik-company--buffer-mode)
-      (magik-company--buffer-local-candidates magik-candidates))
+      (setq magik-candidates (magik-company--buffer-local-candidates magik-candidates)))
 
     (when (or magik-company-prefix-at-globals
 	      magik-company-prefix-at-dynamics)
@@ -166,7 +166,8 @@ COMMAND, ARG, IGNORED"
     (setq magik-candidates (append magik-candidates magik-company--variables-candidates))
 
     (setq magik-company--exemplar-candidate (magik-company--filter-candidates magik-company--classname-cache magik-candidates))
-    (setq magik-candidates (append magik-candidates magik-company--exemplar-candidate))))
+    (setq magik-candidates (append magik-candidates magik-company--exemplar-candidate)))
+  magik-candidates)
 
 (defun magik-company--filter-candidates (new-candidates existing-candidates)
   "Filter NEW-CANDIDATES.
