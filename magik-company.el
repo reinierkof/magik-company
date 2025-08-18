@@ -47,7 +47,6 @@
 (defvar magik-company--slots-candidates nil)
 (defvar magik-company--exemplar-candidate nil)
 (defvar magik-company--initialised? nil)
-(defvar magik-company--major-mode nil)
 (defvar magik-company--session-mode "magik-session-mode")
 (defvar magik-company--buffer-mode "magik-ts-mode")
 
@@ -68,7 +67,6 @@
   "Set up buffer for `magik-company-mode`."
   (make-local-variable 'company-backends)
   (add-to-list 'company-backends 'magik-company)
-  (setq magik-company--major-mode major-mode)
   (unless magik-company--initialised?
     (advice-add #'magik-transmit-region :after #'magik-company-reload-cache)
     (advice-add #'magik-session-kill-process :after #'magik-company--exit-cb-buffers)
@@ -95,7 +93,7 @@ COMMAND, ARG, IGNORED"
   "Prefix and what to load based on those the current point."
   (if (or (magik-company--in-comment)
 	  (magik-company--in-string)
-	  (and (string= magik-company--major-mode magik-company--session-mode)
+	  (and (string= major-mode magik-company--session-mode)
 	       (not (magik-company--session-within-typeable-area))))
       (setq magik-company-prefix-at-methods nil
 	    magik-company-prefix-at-conditions nil
@@ -117,7 +115,7 @@ COMMAND, ARG, IGNORED"
   (magik-company--load-source-caches)
 
   (let ((magik-candidates '()))
-    (when (string= magik-company--major-mode magik-company--buffer-mode)
+    (when (string= major-mode magik-company--buffer-mode)
       (setq magik-candidates (magik-company--buffer-local-candidates magik-candidates)))
 
     (when (or magik-company-prefix-at-globals
