@@ -108,8 +108,7 @@ killing any associated processes without prompting."
 	       nil)))))
     (if session-started?
 	(magik-company--method-finder-started? gis-buffer-name)
-      nil
-      )))
+      nil)))
 
 (defun magik-company--method-finder-started?(gis-buffer-name)
   "Poke the magik-process in GIS-BUFFER-NAME if the method-finder is started."
