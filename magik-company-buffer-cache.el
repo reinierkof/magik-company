@@ -72,29 +72,8 @@
   (magik-company--ts-variables-in-scope))
 
 (defun magik-company--method-parameters ()
-  "Get local buffer parameters from nearest function."
-  (let ((method-regex (cdr (assoc "method-with-arguments" magik-regexp)))
-	(assignment-regex (cdr (assoc "assignment-method" magik-regexp)))
-	params method-loc)
-    (save-excursion
-      (when (re-search-backward "\\(_method\\)" nil t)
-	(setq method-loc (match-beginning 0))))
-    (when method-loc
-      (save-excursion
-	(setq params (or (when (search-backward-regexp method-regex (- method-loc 20) t)
-			   (match-string 1))
-			 (when (search-backward-regexp assignment-regex (- method-loc 20) t)
-			   (match-string 1))))))
-    (when params
-      (setq params (mapcar #'string-trim (split-string params "," t)))
-      (setq params
-	    (cl-loop for param in params
-		     if (or (string-prefix-p "_optional" param)
-			    (string-prefix-p "_gather" param))
-		     collect (nth 1 (split-string param " "))
-		     else
-		     collect param)))
-    params))
+  "Get local parameters in the current scope."
+  (magik-company--ts-parameters-in-scope))
 
 (defun magik-company--exemplar-slots ()
   "Retrieve the slots from a exemplar or mixin."

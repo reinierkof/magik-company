@@ -26,6 +26,7 @@
 (require 'treesit)
 
 (defvar magik-company--ts-scope-keywords '("method" "block" "procedure"))
+(defvar magik-company--ts-parameterized-scope-keywords '("method" "procedure"))
 
 (defun magik-company--ts-node-type-in-scope (node type)
   "TYPE in a NODE."
@@ -41,12 +42,16 @@
 	      (setq stack (append (treesit-node-children current) stack)))))))
     (nreverse results)))
 
-(defun magik-company--ts-enclosing-scope ()
-  "Return the enclosing node of type ts-scope-keywords."
-  (let ((node (treesit-node-at (point))))
+(defun magik-company--ts-enclosing-scope (parameterized?)
+  "Return the enclosing node of type ts-*-scope-keywords.
+When PARAMETERIZED? then only the parameterized keywords"
+  (let ((node (treesit-node-at (point)))
+	(keyword-list (if parameterized?
+			  magik-company--ts-parameterized-scope-keywords
+			magik-company--ts-scope-keywords)))
     (while (and node
 		(not (member (treesit-node-type node)
-			     magik-company--ts-scope-keywords)))
+			     keyword-list)))
       (setq node (treesit-node-parent node)))
     node))
 
@@ -67,6 +72,22 @@
 			 (treesit-query-capture node "(method exemplarname: (identifier) @exemplar)")))))
 	(when results-node
 	  (substring-no-properties (treesit-node-text results-node)))))))
+
+(defun magik-company--ts-parameters-in-scope ()
+  "Get local buffer parameter from method/proc in scope."
+  (let ((parameterized-scope (magik-company--ts-enclosing-scope t)))
+    (when parameterized-scope
+      (let ((children (treesit-node-children parameterized-scope))
+	    (results '())
+	    (found nil))
+	(dolist (child children)
+	  (if (or (string= (treesit-node-text child) "\n")
+		  (string= (treesit-node-text child) ")"))
+	      (setq found t)
+	    (when (and (not found)
+		       (string= (treesit-node-type child) "argument"))
+	      (push (substring-no-properties (treesit-node-text child)) results))))
+	results))))
 
 (defun magik-company--ts-lhs-variables-in-assignment-node(node variables)
   "Lhs variables of an assignment NODE added in VARIABLES list."
@@ -156,7 +177,7 @@
   "Return a list of all variable nodes within the enclosing fragment scope."
   (interactive)
   (let ((variables '())
-	(scope (magik-company--ts-enclosing-scope)))
+	(scope (magik-company--ts-enclosing-scope nil)))
     (when scope
       (setq variables (magik-company--ts-import-variables-in-scope scope variables))
       (dolist (a-node (magik-company--ts-node-type-in-scope scope "assignment"))
