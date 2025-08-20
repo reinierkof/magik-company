@@ -64,8 +64,9 @@
 (defun magik-company--load-classname-cache ()
   "Load the previous class name into the cache and add the exemplar kind property."
   (setq magik-company--classname-cache
-	(mapcar (lambda (el) (propertize el 'kind 'exemplar))
-		(list (magik-yasnippet-prev-class-name)))))
+	(let ((prev-class-name (magik-yasnippet-prev-class-name)))
+	  (when prev-class-name
+	    (list (propertize prev-class-name 'kind 'exemplar))))))
 
 (defun magik-company--local-variables ()
   "Gather local variables in the current scope."
