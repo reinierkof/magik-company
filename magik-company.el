@@ -150,8 +150,8 @@ COMMAND, ARG, IGNORED"
       (magik-company--add-yasnippet-text-property candidate))
 
     (setq magik-candidates (cl-remove-if (lambda (candidate)
-                    (member candidate magik-company-blacklisted-candidates))
-                                         magik-candidates))
+					   (member candidate magik-company-blacklisted-candidates))
+					 magik-candidates))
 
     ;; should not contain duplicates, because the filter takes it out.
     ;; in case we need it we can use this one.
