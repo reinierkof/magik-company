@@ -55,6 +55,11 @@
   :group 'company
   :group 'magik)
 
+(defcustom magik-company-blacklisted-candidates '()
+  "Company backend candidates that are ignored when found."
+  :type '(repeat string)
+  :group 'magik-company)
+
 ;;;###autoload
 (define-minor-mode magik-company-mode
   "Minor mode to enable the Magik company backend."
@@ -143,6 +148,10 @@ COMMAND, ARG, IGNORED"
 
     (dolist (candidate magik-candidates)
       (magik-company--add-yasnippet-text-property candidate))
+
+    (setq magik-candidates (cl-remove-if (lambda (candidate)
+                    (member candidate magik-company-blacklisted-candidates))
+                                         magik-candidates))
 
     ;; should not contain duplicates, because the filter takes it out.
     ;; in case we need it we can use this one.
