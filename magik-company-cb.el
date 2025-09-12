@@ -27,12 +27,12 @@
 (defvar magik-company--session-running nil)
 (defvar magik-company--cb-candidadates nil)
 
-(declare-function magik-company-reload-cache "magik-company")
+(declare-function magik-company--int-reload-cache "magik-company")
 
 (defun magik-company--exit-cb-buffers ()
   "Ensure cb buffers are deleted and status is reset."
   (setq magik-company--session-running nil)
-  (magik-company-reload-cache)
+  (magik-company--int-reload-cache)
   (magik-company--force-kill-cb-company-buffers))
 
 (defun magik-company--cb-filter (p s)
@@ -76,7 +76,7 @@ Returns t if the process was started or running, nil if there's an error."
 	       magik-company--cb-buffer 'magik-company--cb-filter smallworld-gis gis-buffer-name nil)))
       (if (process-live-p magik-company--cb-process)
 	  (progn
-	    (magik-company-reload-cache)
+	    (magik-company--int-reload-cache)
 	    t)
 	nil))))
 

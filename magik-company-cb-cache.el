@@ -42,6 +42,10 @@
 (defun magik-company-reload-cache (&rest _args)
   "Reset the caches such that they will refill upon triggering the prefix."
   (interactive)
+  (magik-company--int-reload-cache))
+
+(defun magik-company--int-reload-cache (&rest _args)
+  "Reset the caches such that they will refill upon triggering the prefix."
   (setq magik-company--objects-source-cache-loaded nil
 	magik-company--globals-source-cache-loaded nil
 	magik-company--conditions-source-cache-loaded nil

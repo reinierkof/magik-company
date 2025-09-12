@@ -73,7 +73,7 @@
   (make-local-variable 'company-backends)
   (add-to-list 'company-backends 'magik-company)
   (unless magik-company--initialised?
-    (advice-add #'magik-transmit-region :after #'magik-company-reload-cache)
+    (advice-add #'magik-transmit-region :after #'magik-company--int-reload-cache)
     (advice-add #'magik-session-kill-process :after #'magik-company--exit-cb-buffers)
     (add-hook 'magik-session-start-process-post-hook #'magik-company--kill-cb-ac-buffer)
     (setq magik-company--initialised? t)))
