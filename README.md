@@ -23,8 +23,9 @@ The alternative, and recommended, way of installing this backend is using [use-p
 
 ```emacs-lisp
 (use-package magik-company
-  :hook (magik-ts-mode . magik-company-mode)
-        (magik-session-mode . magik-company-mode))
+  :bind (("<f3> r" . 'magik-company-reload-cache))
+  :hook ((magik-ts-mode . magik-company-mode)
+         (magik-session-mode . magik-company-mode)))
 ```
 
 ## Features
