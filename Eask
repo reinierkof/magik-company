@@ -1,7 +1,7 @@
 ;; -*- mode: eask; lexical-binding: t -*-
 
 (package "magik-company"
-         "1.1.1"
+         "1.1.2"
          "Magik backend for company-mode")
 
 (website-url "https://github.com/reinierkof/magik-company")
