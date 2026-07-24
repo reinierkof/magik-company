@@ -1,7 +1,7 @@
 ;;; magik-company.el --- Magik backend for company-mode -*- lexical-binding: t; -*-
 
-;; Package-Version: 1.1.1
-;; Package-Requires: ((emacs "29.1") (magik-mode "0.5.1") (company "1.0.2") (yasnippet "0.14.0"))
+;; Package-Version: 1.1.2
+;; Package-Requires: ((emacs "29.1") (magik-mode "0.6.5") (company "1.0.2") (yasnippet "0.14.0"))
 ;; URL: https://github.com/reinierkof/magik-company
 ;; Keywords: convenience
 
