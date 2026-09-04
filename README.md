@@ -1,5 +1,7 @@
 # magik-company: Company backend for Magik files
 
+Deprecated as of 2026-09-04. This package is no longer maintained. Completions are now supported natively by the [magik-mode](https://melpa.org/#/magik-mode) package.
+
 ## Content
 
 1. [Requirements](#requirements)
